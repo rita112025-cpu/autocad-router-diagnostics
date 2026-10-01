@@ -259,6 +259,52 @@
   (t:curved-junction "SCADA_V2$SCADA_TRAY_ELBOW_V2_CURVED_P0" '(1000.0 2000.0) 1 0.48159249 (list (cons "fitrot" 2)))
   (list "all"))
 
+;;; ---- blocks / scenes for: stacked (ambiguous) openings, no derivable openings, segment too short ----
+(defun t:def-stacked (name / d u jx jy h2)
+  ;; E+N elbow with TWO rail sets per arm (half widths 150 and 100) ending on the same cap line: like the V1 CROSS
+  ;; block that stacks several variants on top of each other
+  (if (not (tblobjname "BLOCK" name))
+    (progn
+      (setq jx (car t:jb) jy (cadr t:jb) h2 100.0)
+      (entmake (list '(0 . "BLOCK") (cons 2 name) '(70 . 0) '(10 0.0 0.0 0.0)))
+      (foreach d '(0 1)
+        (setq u (nth d t:dirs))
+        (foreach h (list t:h h2)
+          (t:rect (t:uv t:jb u 0.0 (+ h (/ t:rail 2.0))) (t:uv t:jb u t:tk (- h (/ t:rail 2.0))) "0" nil)
+          (t:rect (t:uv t:jb u 0.0 (- (+ h (/ t:rail 2.0)))) (t:uv t:jb u t:tk (+ (- h) (/ t:rail 2.0))) "0" nil)))
+      (entmake '((0 . "ENDBLK"))))))
+(defun t:def-nocaps (name / d u jx jy h)
+  ;; E+N elbow drawn with open rail edges only (LINEs), no end caps -> no opening can be derived
+  (if (not (tblobjname "BLOCK" name))
+    (progn
+      (setq jx (car t:jb) jy (cadr t:jb))
+      (entmake (list '(0 . "BLOCK") (cons 2 name) '(70 . 0) '(10 0.0 0.0 0.0)))
+      (foreach d '(0 1)
+        (setq u (nth d t:dirs))
+        (foreach cr (list (+ t:h 10.0) (- t:h 10.0) (- (- t:h 10.0)) (- (+ t:h 10.0)))
+          (t:line (t:uv t:jb u 0.0 cr) (t:uv t:jb u t:tk cr) "0")))
+      (entmake '((0 . "ENDBLK"))))))
+(defun t:s-stacked-variants ()
+  (t:def-stacked "SCADA_V2$SCADA_TRAY_ELBOW_V2_STACKED")
+  (t:junction "SCADA_V2$SCADA_TRAY_ELBOW_V2_STACKED" "ELBOW" '(0.0 0.0) 0 1.0 '(("pprofile" . "SCADA_V2")))
+  (list "all"))
+(defun t:s-no-caps ()
+  (t:def-nocaps "SCADA_V2$SCADA_TRAY_ELBOW_V2_NOCAPS")
+  (t:junction "SCADA_V2$SCADA_TRAY_ELBOW_V2_NOCAPS" "ELBOW" '(0.0 0.0) 0 1.0 '(("pprofile" . "SCADA_V2")))
+  (list "all"))
+(defun t:s-short-segment (/ j1 j2 e)
+  ;; two Elbows 500 apart; each needs 300 -> no Straight fits between them (the Router would not generate one)
+  (t:defs) (t:ensure-layer "SCADA-TRAY-PATH") (t:ensure-layer "SCADA-TRAY")
+  (setq j1 '(0.0 0.0) j2 '(0.0 500.0) e '(1.0 0.0))
+  (t:path (list j1 '(2500.0 0.0)) "SCADA_V2" 300.0)
+  (t:path (list j1 j2) "SCADA_V2" 300.0)
+  (t:path (list j2 '(2500.0 500.0)) "SCADA_V2" 300.0)
+  (t:straight j1 e 300.0 1300.0 300.0)
+  (t:straight j2 e 300.0 1300.0 300.0)
+  (t:insert "SCADA_V2$SCADA_TRAY_ELBOW_V2" (t:fit-ip j1 0 1.0 '(0.0 0.0)) 0 1.0 "ELBOW")
+  (t:insert "SCADA_V2$SCADA_TRAY_ELBOW_V2" (t:fit-ip j2 3 1.0 '(0.0 0.0)) 3 1.0 "ELBOW")
+  (list "all"))
+
 ;;; ---- driver -----------------------------------------------------------
 (defun t:dump (path / f en tn tab)
   (setq f (open path "w" "utf8"))

@@ -573,7 +573,16 @@
     (setq i (1+ i)))
   (setq ops (vl-sort ops '(lambda (a b) (< (ard:opening-angle a) (ard:opening-angle b)))))
   (setq i 0)
-  (mapcar '(lambda (op) (setq i (1+ i)) (cons (cons "id" (strcat "O" (itoa i))) op)) ops))
+  (setq ops (mapcar '(lambda (op) (setq i (1+ i)) (cons (cons "id" (strcat "O" (itoa i))) op)) ops))
+  (mapcar '(lambda (op / cnt)
+             (setq cnt 0)
+             (foreach q ops
+               (if (and (< (ard:d2 (cdr (assoc "normal" q)) (cdr (assoc "normal" op))) 1.0e-6)
+                        (< (abs (- (ard:vdot (cdr (assoc "center" q)) (cdr (assoc "normal" q)))
+                                   (ard:vdot (cdr (assoc "center" op)) (cdr (assoc "normal" op))))) tc))
+                 (setq cnt (1+ cnt))))
+             (if (> cnt 1) (cons (cons "ambiguous" T) op) op))
+          ops))
 ;;; least-squares point closest to all opening axes (centre + t * normal); -> (pt rms) or nil
 (defun ard:axis-joint (ops / sxx sxy syy bx by op nv c det x y rms cnt dd)
   (if (< (length ops) 2)
@@ -910,11 +919,27 @@
         (cons "rails" (mapcar '(lambda (r) (mapcar '(lambda (q) (ard:mat-apply m q)) r)) (cdr (assoc "rails" op))))
         (cons "w_cc" (* k (cdr (assoc "width_center_to_center" op))))
         (cons "w_out" (* k (cdr (assoc "width_outer" op))))
-        (cons "w_in" (* k (cdr (assoc "width_inner" op))))))
+        (cons "w_in" (* k (cdr (assoc "width_inner" op))))
+        (cons "amb" (cdr (assoc "ambiguous" op)))))
+(defun ard:amb-facing (arm opws / u hit o)
+  (setq u (list (cos (cadr arm)) (sin (cadr arm))))
+  (foreach o opws
+    (if (and (cdr (assoc "amb" o)) (> (ard:vdot (cdr (assoc "normal" o)) u) (cos (* ard:th-open-dir-deg (/ pi 180.0)))))
+      (setq hit T)))
+  hit)
+(defun ard:next-node-dist (jp u n lay / best j rx ry ax cr)
+  ;; distance from the junction to the nearest OTHER PATH node straight ahead along this arm
+  (foreach j ard:*junctions*
+    (if (= (ard:jget "layout" j) lay)
+      (progn
+        (setq rx (- (car (ard:jget "pt" j)) (car jp)) ry (- (cadr (ard:jget "pt" j)) (cadr jp))
+              ax (+ (* rx (car u)) (* ry (cadr u))) cr (+ (* rx (car n)) (* ry (cadr n))))
+        (if (and (> ax ard:th-pt) (< (abs cr) ard:th-pt) (or (null best) (< ax best))) (setq best ax)))))
+  best)
 (defun ard:match-opening (arm jp opws used / u best bd o d)
   (setq u (list (cos (cadr arm)) (sin (cadr arm))))
   (foreach o opws
-    (if (and (not (member (cdr (assoc "id" o)) used))
+    (if (and (not (member (cdr (assoc "id" o)) used)) (not (cdr (assoc "amb" o)))
              (> (ard:vdot (cdr (assoc "normal" o)) u) (cos (* ard:th-open-dir-deg (/ pi 180.0)))))
       (progn
         (setq d (ard:d2 (cdr (assoc "center" o)) jp))
@@ -954,20 +979,32 @@
                          '(lambda (a b) (< (ard:vdot (ard:vsub (nth 2 a) jp) n) (ard:vdot (ard:vsub (nth 2 b) jp) n))))))))))
 ;;; opening = fitting side (derived from block geometry), Straight = the generated Straight end face
 ;;; on the same arm.  expected = opening centre, actual = Straight connection point.
-(defun ard:connection (fit jn arm spts op derived / jp fr u n w halfw fpts sf ff status err ex ac reason d
+(defun ard:connection (fit jn arm spts op derived / jp fr u n w halfw fpts sf ff status err ex ac reason d nextd
                                                     fax flat method rails srails k)
   (setq jp (ard:jget "pt" jn) fr (ard:arm-frame arm) u (car fr) n (cadr fr)
         w (nth 5 arm) halfw (+ (/ w 2.0) ard:th-corridor))
   (setq fpts (ard:get "_pts" fit))
-  (setq sf (ard:face spts jp u n halfw 'MIN))
+  (setq nextd (ard:next-node-dist jp u n (ard:get "layout" fit)))
+  (setq sf (ard:face (if nextd
+                       (vl-remove-if-not '(lambda (q) (<= (+ (* (- (car q) (car jp)) (car u)) (* (- (cadr q) (cadr jp)) (cadr u)))
+                                                          (+ nextd ard:th-pt)))
+                                         spts)
+                       spts)
+                     jp u n halfw 'MIN))
   (cond
     ((null sf)
      (setq status "NOT_COMPUTABLE"
-           reason "no generated Straight vertex ahead of the junction on this arm (Straight missing, too short, or outside the corridor)"))
+           reason (if nextd
+                    (strcat "no generated Straight between this junction and the next PATH node " (rtos nextd 2 3)
+                            " mm ahead (segment too short for a Straight, or Straight missing)")
+                    "no generated Straight vertex ahead of the junction on this arm (Straight missing or outside the corridor)")))
     (op
      (setq method "derived_opening"
            fax (ard:vdot (ard:vsub (cdr (assoc "center" op)) jp) u)
            flat (ard:vdot (ard:vsub (cdr (assoc "center" op)) jp) n)))
+    ((eq derived 'AMB)
+     (setq status "AMBIGUOUS_OPENING"
+           reason "the block has several stacked openings on the face that looks at this arm; the real one cannot be identified from geometry"))
     (derived
      (setq status "NO_OPENING"
            reason "the fitting has no opening facing this arm direction (rotation / fitting type does not match the PATH junction)"))
@@ -991,6 +1028,7 @@
           (cons "path_handle" (nth 3 arm)) (cons "arm_profile" (nth 4 arm)) (cons "arm_width" w)
           (cons "status" status) (cons "reason" reason) (cons "method" method)
           (cons "opening_id" (if op (cdr (assoc "id" op)) nil))
+          (cons "next_node_distance_mm" nextd)
           (cons "expected_source" (if op "centre of the fitting opening derived from block geometry (rail centres midpoint), transformed to WCS"
                                       "centre of farthest end face of fitting geometry (fallback, weak evidence)"))
           (cons "actual_source" "centre of the nearest generated Straight end face on this arm")
@@ -1176,6 +1214,9 @@
       ((= (ard:get "_status" c) "NEAR")
        (setq issues (cons (ard:issue "WARN" "CONNECTION_NEAR"
          (strcat "arm " (ard:get "direction" c) ": error " (rtos e 2 4) " mm")) issues)))
+      ((= (ard:get "_status" c) "AMBIGUOUS_OPENING")
+       (setq issues (cons (ard:issue "WARN" "OPENING_AMBIGUOUS"
+         (strcat "arm " (ard:get "direction" c) ": " (ard:get "reason" c))) issues)))
       ((= (ard:get "_status" c) "NO_OPENING")
        (setq issues (cons (ard:issue "FAIL" "ARM_WITHOUT_OPENING"
          (strcat "arm " (ard:get "direction" c) ": " (ard:get "reason" c))) issues)))
@@ -1239,10 +1280,15 @@
       (foreach g (ard:jget "arms" jn)
         (setq op (ard:match-opening g (ard:jget "pt" jn) opws used))
         (if op (setq used (cons (cdr (assoc "id" op)) used)))
-        (setq conns (cons (ard:connection fit jn g spts op (if ops T nil)) conns)))
+        (setq conns (cons (ard:connection fit jn g spts op
+                                          (cond ((null ops) nil) ((and (null op) (ard:amb-facing g opws)) 'AMB) (T T)))
+                          conns)))
+      (if (and (null ops) (car blk) (cadr blk))
+        (setq issues (cons (ard:issue "WARN" "OPENING_NOT_DERIVED"
+                             "no opening could be derived from the block geometry; the weak extreme-face fallback was used") issues)))
       (setq conns (reverse conns))
       (foreach o opws
-        (if (not (member (cdr (assoc "id" o)) used))
+        (if (and (not (member (cdr (assoc "id" o)) used)) (not (cdr (assoc "amb" o))))
           (setq issues (cons (ard:issue "FAIL" "OPENING_WITHOUT_ARM"
             (strcat "fitting opening " (cdr (assoc "id" o)) " at (" (rtos (car (cdr (assoc "center" o))) 2 3) ", "
                     (rtos (cadr (cdr (assoc "center" o))) 2 3) ") faces "
@@ -1402,6 +1448,7 @@
           (cons "width_outer_edge_to_outer_edge" (cdr (assoc "width_outer" o)))
           (cons "width_inner_edge_to_inner_edge" (cdr (assoc "width_inner" o)))
           (cons "rail_end_cap_length" (cdr (assoc "cap_length" o)))
+          (cons "ambiguous" (ard:bool (cdr (assoc "ambiguous" o))))
           (cons "rails"
             (ard:arr (mapcar '(lambda (r)
               (ard:obj (list (cons "outer_edge_point" (ard:pt2 (nth 0 r)))
