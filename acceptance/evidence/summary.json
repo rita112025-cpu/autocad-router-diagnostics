@@ -36,7 +36,7 @@
   "passed": 134,
   "failed": 0
  },
- "router_sha": "1a1792335f25b7a9cb888285099c50fbfde12c247643bafb59305d8b2fb6f70e",
+ "router_sha": "378cc5cdc281f5856b028d4f0cc37ddb7458ada928ed41d4ea71cbf07a245948",
  "diagnostics_items_9_10": "PENDING HUMAN GUI",
- "width_scope": "300 mm only; other widths NOT VERIFIED"
+ "width_scope": "300 mm (this run only)"
 }

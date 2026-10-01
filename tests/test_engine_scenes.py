@@ -620,3 +620,65 @@ class CurvedElbowOpenings(unittest.TestCase):
         self.assertIn("ARM_WITHOUT_OPENING", codes(f))
         self.assertIn("OPENING_WITHOUT_ARM", codes(f))
         self.assertIn("NO_OPENING", [c["status"] for c in f["connections"]])
+
+
+class AmbiguityAndShortSegments(unittest.TestCase):
+    """Regression for TEST_V1.dwg: stacked-variant blocks and fittings closer than their takeoffs must not give FAIL by guesswork."""
+
+    def test_stacked_openings_are_ambiguous_not_guessed(self):
+        f = fit("stacked-variants")
+        self.assertEqual(f["opening_method"], "derived_opening")
+        self.assertEqual(sorted(c["status"] for c in f["connections"]), ["AMBIGUOUS_OPENING", "AMBIGUOUS_OPENING"])
+        self.assertTrue(all(c["error_mm"] is None and c["opening_id"] is None for c in f["connections"]))
+        self.assertEqual(codes(f).count("OPENING_AMBIGUOUS"), 2)
+        self.assertNotIn("OPENING_WITHOUT_ARM", codes(f))
+        self.assertNotIn("CONNECTION_MISMATCH", codes(f))
+        self.assertEqual(f["status"], "WARN")
+        b = rep("stacked-variants")["blocks"][0]
+        self.assertTrue(any(o["ambiguous"] for o in b["openings"]))
+
+    def test_no_derivable_opening_falls_back_with_a_warning(self):
+        f = fit("no-caps")
+        self.assertEqual(f["opening_method"], "extreme_face_fallback")
+        self.assertIn("OPENING_NOT_DERIVED", codes(f))
+        self.assertEqual(f["status"], "WARN")
+        self.assertTrue(all(c["method"] == "extreme_face_fallback" for c in f["connections"]))
+
+    def test_unique_openings_are_not_flagged_ambiguous(self):
+        for scene in ("elbow-r0", "tee-r0", "cross", "curved-r1", "curved-decoy"):
+            for o in rep(scene)["blocks"][0]["openings"]:
+                self.assertFalse(o["ambiguous"], scene)
+
+    def test_segment_shorter_than_two_takeoffs_has_no_straight_and_says_so(self):
+        r = rep("short-segment")
+        by_dir = {}
+        for f in r["fittings"]:
+            for c in f["connections"]:
+                by_dir[(f["junction"]["junction_y"], c["direction"])] = c
+        n_arm = by_dir[(0.0, "N")]
+        s_arm = by_dir[(500.0, "S")]
+        for c in (n_arm, s_arm):
+            self.assertEqual(c["status"], "NOT_COMPUTABLE")
+            self.assertAlmostEqual(c["next_node_distance_mm"], 500.0, places=6)
+            self.assertIn("between this junction and the next PATH node 500", c["reason"])
+        for key in ((0.0, "E"), (500.0, "E")):
+            self.assertEqual(by_dir[key]["status"], "EXACT")                 # the far Straights are NOT mistaken for it
+        for f in r["fittings"]:
+            self.assertEqual(f["status"], "WARN")
+            self.assertNotIn("CONNECTION_MISMATCH", codes(f))
+
+
+class StackedBlockUnpairedOpening(unittest.TestCase):
+    def test_unpaired_opening_in_a_stacked_variant_block_is_a_warning(self):
+        """TEST_V3.dwg: the SCADA_BASIC TEE block stacks variants and also has a clean opening facing away from every arm."""
+        f = fit("stacked-unpaired")
+        self.assertIn("OPENING_UNPAIRED_IN_STACKED_BLOCK", codes(f))
+        self.assertNotIn("OPENING_WITHOUT_ARM", codes(f))
+        sev = {i["code"]: i["severity"] for i in f["issues"]}
+        self.assertEqual(sev["OPENING_UNPAIRED_IN_STACKED_BLOCK"], "WARN")
+        self.assertEqual(f["status"], "WARN")
+
+    def test_unpaired_opening_in_a_clean_block_is_still_a_failure(self):
+        f = fit("rot-error")
+        self.assertIn("OPENING_WITHOUT_ARM", codes(f))
+        self.assertEqual(f["status"], "FAIL")

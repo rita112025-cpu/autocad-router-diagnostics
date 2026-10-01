@@ -1,0 +1,42 @@
+{
+ "dwg": "D:\\github\\autocad-router-diagnostics\\acceptance\\scada_v2_150_acceptance.dwg",
+ "dwg_sha256_before": "4b4d8ce9d98a6a35a735acc00d9e0538460694999027b122c6bfd6a9e82fcce8",
+ "dwg_sha256_after": "4b4d8ce9d98a6a35a735acc00d9e0538460694999027b122c6bfd6a9e82fcce8",
+ "joints_total": 47,
+ "joints_pass": 47,
+ "joints_fail": [],
+ "tee_cross_regression": {
+  "B1_TEE_branch_N": {
+   "entities_now": 30,
+   "entities_baseline": 30,
+   "identical": true
+  },
+  "B2_TEE_branch_S": {
+   "entities_now": 30,
+   "entities_baseline": 30,
+   "identical": true
+  },
+  "B3_TEE_branch_W": {
+   "entities_now": 28,
+   "entities_baseline": 28,
+   "identical": true
+  },
+  "B4_TEE_branch_E": {
+   "entities_now": 28,
+   "entities_baseline": 28,
+   "identical": true
+  },
+  "C1_CROSS": {
+   "entities_now": 47,
+   "entities_baseline": 47,
+   "identical": true
+  }
+ },
+ "router_regression": {
+  "passed": 134,
+  "failed": 0
+ },
+ "router_sha": "378cc5cdc281f5856b028d4f0cc37ddb7458ada928ed41d4ea71cbf07a245948",
+ "diagnostics_items_9_10": "PENDING HUMAN GUI",
+ "width_scope": "150 mm (this run only)"
+}

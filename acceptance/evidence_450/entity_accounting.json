@@ -1,0 +1,151 @@
+{
+ "drawing_total_entities": 415,
+ "ssget_count": 415,
+ "by_type": {
+  "LWPOLYLINE": 396,
+  "INSERT": 19
+ },
+ "by_layer": {
+  "SCADA-TRAY": 396,
+  "SCADA-TRAY-PATH": 19
+ },
+ "by_layout": {
+  "Model": 415
+ },
+ "router_generated_entities": 396,
+ "router_generated_by_type": {
+  "LWPOLYLINE": 377,
+  "INSERT": 19
+ },
+ "user_path_entities": 19,
+ "entities_outside_every_case_window": 0,
+ "per_case": {
+  "A1_W+N": {
+   "entities": 26,
+   "matched": {
+    "PATH": 1,
+    "FITTING": 1,
+    "STRAIGHT_RUNG": 20,
+    "STRAIGHT_RAIL": 4
+   }
+  },
+  "A2_W+S": {
+   "entities": 26,
+   "matched": {
+    "PATH": 1,
+    "FITTING": 1,
+    "STRAIGHT_RUNG": 20,
+    "STRAIGHT_RAIL": 4
+   }
+  },
+  "A3_E+S": {
+   "entities": 26,
+   "matched": {
+    "PATH": 1,
+    "FITTING": 1,
+    "STRAIGHT_RUNG": 20,
+    "STRAIGHT_RAIL": 4
+   }
+  },
+  "A4_E+N": {
+   "entities": 26,
+   "matched": {
+    "PATH": 1,
+    "FITTING": 1,
+    "STRAIGHT_RUNG": 20,
+    "STRAIGHT_RAIL": 4
+   }
+  },
+  "B1_TEE_branch_N": {
+   "entities": 24,
+   "matched": {
+    "PATH": 2,
+    "FITTING": 1,
+    "STRAIGHT_RUNG": 15,
+    "STRAIGHT_RAIL": 6
+   }
+  },
+  "B2_TEE_branch_S": {
+   "entities": 24,
+   "matched": {
+    "PATH": 2,
+    "FITTING": 1,
+    "STRAIGHT_RUNG": 15,
+    "STRAIGHT_RAIL": 6
+   }
+  },
+  "B3_TEE_branch_W": {
+   "entities": 22,
+   "matched": {
+    "PATH": 2,
+    "FITTING": 1,
+    "STRAIGHT_RUNG": 13,
+    "STRAIGHT_RAIL": 6
+   }
+  },
+  "B4_TEE_branch_E": {
+   "entities": 22,
+   "matched": {
+    "PATH": 2,
+    "FITTING": 1,
+    "STRAIGHT_RUNG": 13,
+    "STRAIGHT_RAIL": 6
+   }
+  },
+  "C1_CROSS": {
+   "entities": 39,
+   "matched": {
+    "PATH": 2,
+    "FITTING": 1,
+    "STRAIGHT_RUNG": 28,
+    "STRAIGHT_RAIL": 8
+   }
+  },
+  "D1_CHAIN": {
+   "entities": 110,
+   "matched": {
+    "PATH": 3,
+    "FITTING": 4,
+    "STRAIGHT_RUNG": 87,
+    "STRAIGHT_RAIL": 16
+   }
+  },
+  "E1_TURNS_long": {
+   "entities": 46,
+   "matched": {
+    "PATH": 1,
+    "FITTING": 3,
+    "STRAIGHT_RUNG": 34,
+    "STRAIGHT_RAIL": 8
+   }
+  },
+  "E2_TURNS_short": {
+   "entities": 24,
+   "matched": {
+    "PATH": 1,
+    "FITTING": 3,
+    "STRAIGHT_RUNG": 12,
+    "STRAIGHT_RAIL": 8
+   }
+  }
+ },
+ "ladder_observation": {
+  "rungs_matched": 297,
+  "rung_lateral_half_mm": 205.0,
+  "rail_inner_edge_mm": 215.0,
+  "rung_end_to_rail_gap_mm": 10.0,
+  "note": "rungs follow the Router source rule (half length = width/2 - thickness) but the rails are centred on +-width/2, so every rung stops short of both rail inner edges; Straight-internal observation, not a joint error"
+ },
+ "classification": {
+  "STRAIGHT rung matched": 297,
+  "STRAIGHT rail matched": 80,
+  "FITTING matched": 19,
+  "PATH matched": 19
+ },
+ "matched_total": 415,
+ "unmatched_total": 0,
+ "duplicates": 0,
+ "unexpected": [],
+ "duplicate_entities": [],
+ "expected_but_missing": []
+}

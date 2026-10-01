@@ -73,6 +73,7 @@ otherwise the `CTR_GEN` XDATA tag `ELBOW|TEE|CROSS`. The profile is the text bef
   `NO_OPENING` (`ARM_WITHOUT_OPENING`, FAIL); an opening facing a direction with no arm is `OPENING_WITHOUT_ARM` (FAIL) - the signature of a wrong rotation.
   Rail-level evidence: `rail_center_differences_mm`. If a block yields no openings the tool falls back to `extreme_face_fallback` (weak evidence, stated in
   `method`). If either side cannot be found: `"status":"NOT_COMPUTABLE"` with a `reason` - nothing is invented.
+* **Not guessed:** several openings on the same face line (a block with stacked variants, e.g. the SCADA_BASIC CROSS) are marked `ambiguous`; the arm gets `AMBIGUOUS_OPENING` (`OPENING_AMBIGUOUS`, WARN) instead of an invented error. A block with no derivable opening uses the weak fallback and gets `OPENING_NOT_DERIVED` (WARN). The Straight search stops at the next PATH node (`next_node_distance_mm`), so two fittings closer than their takeoffs (no Straight generated) give `NOT_COMPUTABLE` with that distance, not a Straight from beyond the neighbouring fitting.
 * **`translation_fit`**: solves one rigid world translation `T` from the *lateral* components of the per-arm deltas (least squares) and
   leaves a per-arm `axial_residual`. `in_block_coords` is `T` un-rotated and un-scaled. Rules of thumb:
   `T != 0`, small residuals -> placement (block origin / BASE_OFFSET); `T ~ 0`, equal axial residuals -> arm length / TAKEOFF;
