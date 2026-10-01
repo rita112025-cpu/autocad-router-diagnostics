@@ -1,0 +1,2352 @@
+[
+ {
+  "case_id": "A1_W+N",
+  "joint_id": "A1_W+N/N2/W",
+  "junction_type": "ELBOW",
+  "orientation": "W+N",
+  "node": [
+   0,
+   0
+  ],
+  "fitting_handle": "40E",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   -155.1370026293,
+   0
+  ],
+  "actual_point": [
+   -155.1370026293,
+   0
+  ],
+  "gap_mm": 0.0,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": 0,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -4.0133e-06,
+   4.0133e-06
+  ],
+  "opening_distance_mm": 155.1370026293,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026300001,
+  "derived_joint_wcs": [
+   -8.0267e-06,
+   0
+  ],
+  "designed_node": [
+   0,
+   0
+  ],
+  "candidate_entity_count": 10,
+  "matched_entity_handles": [
+   "40E",
+   "5B2",
+   "5B1"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "A1_W+N",
+  "joint_id": "A1_W+N/N2/N",
+  "junction_type": "ELBOW",
+  "orientation": "W+N",
+  "node": [
+   0,
+   0
+  ],
+  "fitting_handle": "40E",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   -8.0265e-06,
+   155.1369946028
+  ],
+  "actual_point": [
+   0,
+   155.1370026293
+  ],
+  "gap_mm": 8.0265e-06,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -8.0265e-06,
+  "lateral_error_mm": 8.0265e-06,
+  "rail_center_differences_mm": [
+   4.0133e-06,
+   1.20398e-05
+  ],
+  "opening_distance_mm": 155.1369946028,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.13700263,
+  "derived_joint_wcs": [
+   -8.0267e-06,
+   0
+  ],
+  "designed_node": [
+   0,
+   0
+  ],
+  "candidate_entity_count": 10,
+  "matched_entity_handles": [
+   "40E",
+   "5BF",
+   "5BE"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "A2_W+S",
+  "joint_id": "A2_W+S/N3/W",
+  "junction_type": "ELBOW",
+  "orientation": "W+S",
+  "node": [
+   10000,
+   0
+  ],
+  "fitting_handle": "40D",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   9844.8630053972,
+   -8.0265e-06
+  ],
+  "actual_point": [
+   9844.8629973707,
+   0
+  ],
+  "gap_mm": 8.0265e-06,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -8.0265e-06,
+  "lateral_error_mm": 8.0265e-06,
+  "rail_center_differences_mm": [
+   4.0133e-06,
+   1.20398e-05
+  ],
+  "opening_distance_mm": 155.1369946028,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026299992,
+  "derived_joint_wcs": [
+   10000,
+   -8.0267e-06
+  ],
+  "designed_node": [
+   10000,
+   0
+  ],
+  "candidate_entity_count": 10,
+  "matched_entity_handles": [
+   "40D",
+   "598",
+   "597"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "A2_W+S",
+  "joint_id": "A2_W+S/N3/S",
+  "junction_type": "ELBOW",
+  "orientation": "W+S",
+  "node": [
+   10000,
+   0
+  ],
+  "fitting_handle": "40D",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   10000,
+   -155.1370026293
+  ],
+  "actual_point": [
+   10000,
+   -155.1370026293
+  ],
+  "gap_mm": 0.0,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": 0,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -4.0133e-06,
+   4.0133e-06
+  ],
+  "opening_distance_mm": 155.1370026293,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026300001,
+  "derived_joint_wcs": [
+   10000,
+   -8.0267e-06
+  ],
+  "designed_node": [
+   10000,
+   0
+  ],
+  "candidate_entity_count": 10,
+  "matched_entity_handles": [
+   "40D",
+   "5A5",
+   "5A4"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "A3_E+S",
+  "joint_id": "A3_E+S/N2/E",
+  "junction_type": "ELBOW",
+  "orientation": "E+S",
+  "node": [
+   20000,
+   0
+  ],
+  "fitting_handle": "40C",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   20155.1370026293,
+   0
+  ],
+  "actual_point": [
+   20155.1370026293,
+   0
+  ],
+  "gap_mm": 0.0,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": 0,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -4.0133e-06,
+   4.0133e-06
+  ],
+  "opening_distance_mm": 155.1370026293,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026299992,
+  "derived_joint_wcs": [
+   20000.0000080267,
+   0
+  ],
+  "designed_node": [
+   20000,
+   0
+  ],
+  "candidate_entity_count": 10,
+  "matched_entity_handles": [
+   "40C",
+   "57E",
+   "57D"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "A3_E+S",
+  "joint_id": "A3_E+S/N2/S",
+  "junction_type": "ELBOW",
+  "orientation": "E+S",
+  "node": [
+   20000,
+   0
+  ],
+  "fitting_handle": "40C",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   20000.0000080266,
+   -155.1369946028
+  ],
+  "actual_point": [
+   20000,
+   -155.1370026293
+  ],
+  "gap_mm": 8.0265e-06,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -8.0265e-06,
+  "lateral_error_mm": 8.0265e-06,
+  "rail_center_differences_mm": [
+   4.0133e-06,
+   1.20398e-05
+  ],
+  "opening_distance_mm": 155.1369946028,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026300001,
+  "derived_joint_wcs": [
+   20000.0000080267,
+   0
+  ],
+  "designed_node": [
+   20000,
+   0
+  ],
+  "candidate_entity_count": 10,
+  "matched_entity_handles": [
+   "40C",
+   "58B",
+   "58A"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "A4_E+N",
+  "joint_id": "A4_E+N/N1/E",
+  "junction_type": "ELBOW",
+  "orientation": "E+N",
+  "node": [
+   30000,
+   0
+  ],
+  "fitting_handle": "40B",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   30155.1369946029,
+   8.0265e-06
+  ],
+  "actual_point": [
+   30155.1370026293,
+   0
+  ],
+  "gap_mm": 8.0265e-06,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -8.0265e-06,
+  "lateral_error_mm": 8.0265e-06,
+  "rail_center_differences_mm": [
+   4.0133e-06,
+   1.20398e-05
+  ],
+  "opening_distance_mm": 155.1369946028,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026299992,
+  "derived_joint_wcs": [
+   30000,
+   8.0267e-06
+  ],
+  "designed_node": [
+   30000,
+   0
+  ],
+  "candidate_entity_count": 10,
+  "matched_entity_handles": [
+   "40B",
+   "564",
+   "563"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "A4_E+N",
+  "joint_id": "A4_E+N/N1/N",
+  "junction_type": "ELBOW",
+  "orientation": "E+N",
+  "node": [
+   30000,
+   0
+  ],
+  "fitting_handle": "40B",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   30000,
+   155.1370026293
+  ],
+  "actual_point": [
+   30000,
+   155.1370026293
+  ],
+  "gap_mm": 0.0,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": 0,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -4.0133e-06,
+   4.0133e-06
+  ],
+  "opening_distance_mm": 155.1370026293,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.13700263,
+  "derived_joint_wcs": [
+   30000,
+   8.0267e-06
+  ],
+  "designed_node": [
+   30000,
+   0
+  ],
+  "candidate_entity_count": 10,
+  "matched_entity_handles": [
+   "40B",
+   "571",
+   "570"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "B1_TEE_branch_N",
+  "joint_id": "B1_TEE_branch_N/N2/E",
+  "junction_type": "TEE",
+  "orientation": "E+W+N",
+  "node": [
+   40500,
+   0
+  ],
+  "fitting_handle": "40A",
+  "block": "SCADA_V2$SCADA_TRAY_TEE_V2",
+  "expected_point": [
+   40703.571449955,
+   0
+  ],
+  "actual_point": [
+   40703.5714657113,
+   0
+  ],
+  "gap_mm": 1.57563e-05,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.57563e-05,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.8782e-06,
+   7.8782e-06
+  ],
+  "opening_distance_mm": 203.571449955,
+  "straight_start_diag_mm": 203.5714657113,
+  "straight_start_census_mm": 203.5714657100034,
+  "derived_joint_wcs": [
+   40500,
+   0
+  ],
+  "designed_node": [
+   40500,
+   0
+  ],
+  "candidate_entity_count": 14,
+  "matched_entity_handles": [
+   "40A",
+   "55D",
+   "55C"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "B1_TEE_branch_N",
+  "joint_id": "B1_TEE_branch_N/N2/W",
+  "junction_type": "TEE",
+  "orientation": "E+W+N",
+  "node": [
+   40500,
+   0
+  ],
+  "fitting_handle": "40A",
+  "block": "SCADA_V2$SCADA_TRAY_TEE_V2",
+  "expected_point": [
+   40296.428550045,
+   0
+  ],
+  "actual_point": [
+   40296.4285342887,
+   0
+  ],
+  "gap_mm": 1.57563e-05,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.57563e-05,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.8782e-06,
+   7.8782e-06
+  ],
+  "opening_distance_mm": 203.571449955,
+  "straight_start_diag_mm": 203.5714657113,
+  "straight_start_census_mm": 203.5714657100034,
+  "derived_joint_wcs": [
+   40500,
+   0
+  ],
+  "designed_node": [
+   40500,
+   0
+  ],
+  "candidate_entity_count": 14,
+  "matched_entity_handles": [
+   "40A",
+   "556",
+   "555"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "B1_TEE_branch_N",
+  "joint_id": "B1_TEE_branch_N/N2/N",
+  "junction_type": "TEE",
+  "orientation": "E+W+N",
+  "node": [
+   40500,
+   0
+  ],
+  "fitting_handle": "40A",
+  "block": "SCADA_V2$SCADA_TRAY_TEE_V2",
+  "expected_point": [
+   40500,
+   203.571449955
+  ],
+  "actual_point": [
+   40500,
+   203.5714657113
+  ],
+  "gap_mm": 1.57563e-05,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.57563e-05,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.8782e-06,
+   7.8782e-06
+  ],
+  "opening_distance_mm": 203.571449955,
+  "straight_start_diag_mm": 203.5714657113,
+  "straight_start_census_mm": 203.57146571,
+  "derived_joint_wcs": [
+   40500,
+   0
+  ],
+  "designed_node": [
+   40500,
+   0
+  ],
+  "candidate_entity_count": 14,
+  "matched_entity_handles": [
+   "40A",
+   "549",
+   "548"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "B2_TEE_branch_S",
+  "joint_id": "B2_TEE_branch_S/N3/E",
+  "junction_type": "TEE",
+  "orientation": "E+W+S",
+  "node": [
+   46500,
+   0
+  ],
+  "fitting_handle": "409",
+  "block": "SCADA_V2$SCADA_TRAY_TEE_V2",
+  "expected_point": [
+   46703.571449955,
+   0
+  ],
+  "actual_point": [
+   46703.5714657113,
+   0
+  ],
+  "gap_mm": 1.57563e-05,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.57563e-05,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.8782e-06,
+   7.8782e-06
+  ],
+  "opening_distance_mm": 203.571449955,
+  "straight_start_diag_mm": 203.5714657113,
+  "straight_start_census_mm": 203.5714657100034,
+  "derived_joint_wcs": [
+   46500,
+   0
+  ],
+  "designed_node": [
+   46500,
+   0
+  ],
+  "candidate_entity_count": 14,
+  "matched_entity_handles": [
+   "409",
+   "542",
+   "541"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "B2_TEE_branch_S",
+  "joint_id": "B2_TEE_branch_S/N3/W",
+  "junction_type": "TEE",
+  "orientation": "E+W+S",
+  "node": [
+   46500,
+   0
+  ],
+  "fitting_handle": "409",
+  "block": "SCADA_V2$SCADA_TRAY_TEE_V2",
+  "expected_point": [
+   46296.428550045,
+   0
+  ],
+  "actual_point": [
+   46296.4285342887,
+   0
+  ],
+  "gap_mm": 1.57563e-05,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.57563e-05,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.8782e-06,
+   7.8782e-06
+  ],
+  "opening_distance_mm": 203.571449955,
+  "straight_start_diag_mm": 203.5714657113,
+  "straight_start_census_mm": 203.5714657100034,
+  "derived_joint_wcs": [
+   46500,
+   0
+  ],
+  "designed_node": [
+   46500,
+   0
+  ],
+  "candidate_entity_count": 14,
+  "matched_entity_handles": [
+   "409",
+   "53B",
+   "53A"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "B2_TEE_branch_S",
+  "joint_id": "B2_TEE_branch_S/N3/S",
+  "junction_type": "TEE",
+  "orientation": "E+W+S",
+  "node": [
+   46500,
+   0
+  ],
+  "fitting_handle": "409",
+  "block": "SCADA_V2$SCADA_TRAY_TEE_V2",
+  "expected_point": [
+   46500,
+   -203.571449955
+  ],
+  "actual_point": [
+   46500,
+   -203.5714657113
+  ],
+  "gap_mm": 1.57563e-05,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.57563e-05,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.8782e-06,
+   7.8782e-06
+  ],
+  "opening_distance_mm": 203.571449955,
+  "straight_start_diag_mm": 203.5714657113,
+  "straight_start_census_mm": 203.5714657100002,
+  "derived_joint_wcs": [
+   46500,
+   0
+  ],
+  "designed_node": [
+   46500,
+   0
+  ],
+  "candidate_entity_count": 14,
+  "matched_entity_handles": [
+   "409",
+   "52E",
+   "52D"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "B3_TEE_branch_W",
+  "joint_id": "B3_TEE_branch_W/N3/W",
+  "junction_type": "TEE",
+  "orientation": "W+N+S",
+  "node": [
+   52500,
+   0
+  ],
+  "fitting_handle": "408",
+  "block": "SCADA_V2$SCADA_TRAY_TEE_V2",
+  "expected_point": [
+   52296.428550045,
+   0
+  ],
+  "actual_point": [
+   52296.4285342887,
+   0
+  ],
+  "gap_mm": 1.57563e-05,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.57563e-05,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.8782e-06,
+   7.8782e-06
+  ],
+  "opening_distance_mm": 203.571449955,
+  "straight_start_diag_mm": 203.5714657113,
+  "straight_start_census_mm": 203.5714657100034,
+  "derived_joint_wcs": [
+   52500,
+   0
+  ],
+  "designed_node": [
+   52500,
+   0
+  ],
+  "candidate_entity_count": 14,
+  "matched_entity_handles": [
+   "408",
+   "515",
+   "514"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "B3_TEE_branch_W",
+  "joint_id": "B3_TEE_branch_W/N3/N",
+  "junction_type": "TEE",
+  "orientation": "W+N+S",
+  "node": [
+   52500,
+   0
+  ],
+  "fitting_handle": "408",
+  "block": "SCADA_V2$SCADA_TRAY_TEE_V2",
+  "expected_point": [
+   52500,
+   203.571449955
+  ],
+  "actual_point": [
+   52500,
+   203.5714657113
+  ],
+  "gap_mm": 1.57563e-05,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.57563e-05,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.8782e-06,
+   7.8782e-06
+  ],
+  "opening_distance_mm": 203.571449955,
+  "straight_start_diag_mm": 203.5714657113,
+  "straight_start_census_mm": 203.57146571,
+  "derived_joint_wcs": [
+   52500,
+   0
+  ],
+  "designed_node": [
+   52500,
+   0
+  ],
+  "candidate_entity_count": 14,
+  "matched_entity_handles": [
+   "408",
+   "525",
+   "524"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "B3_TEE_branch_W",
+  "joint_id": "B3_TEE_branch_W/N3/S",
+  "junction_type": "TEE",
+  "orientation": "W+N+S",
+  "node": [
+   52500,
+   0
+  ],
+  "fitting_handle": "408",
+  "block": "SCADA_V2$SCADA_TRAY_TEE_V2",
+  "expected_point": [
+   52500,
+   -203.571449955
+  ],
+  "actual_point": [
+   52500,
+   -203.5714657113
+  ],
+  "gap_mm": 1.57563e-05,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.57563e-05,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.8782e-06,
+   7.8782e-06
+  ],
+  "opening_distance_mm": 203.571449955,
+  "straight_start_diag_mm": 203.5714657113,
+  "straight_start_census_mm": 203.57146570999998,
+  "derived_joint_wcs": [
+   52500,
+   0
+  ],
+  "designed_node": [
+   52500,
+   0
+  ],
+  "candidate_entity_count": 14,
+  "matched_entity_handles": [
+   "408",
+   "51C",
+   "51B"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "B4_TEE_branch_E",
+  "joint_id": "B4_TEE_branch_E/N2/E",
+  "junction_type": "TEE",
+  "orientation": "E+N+S",
+  "node": [
+   58500,
+   0
+  ],
+  "fitting_handle": "407",
+  "block": "SCADA_V2$SCADA_TRAY_TEE_V2",
+  "expected_point": [
+   58703.571449955,
+   0
+  ],
+  "actual_point": [
+   58703.5714657113,
+   0
+  ],
+  "gap_mm": 1.57563e-05,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.57563e-05,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.8782e-06,
+   7.8782e-06
+  ],
+  "opening_distance_mm": 203.571449955,
+  "straight_start_diag_mm": 203.5714657113,
+  "straight_start_census_mm": 203.5714657100034,
+  "derived_joint_wcs": [
+   58500,
+   0
+  ],
+  "designed_node": [
+   58500,
+   0
+  ],
+  "candidate_entity_count": 14,
+  "matched_entity_handles": [
+   "407",
+   "4FC",
+   "4FB"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "B4_TEE_branch_E",
+  "joint_id": "B4_TEE_branch_E/N2/N",
+  "junction_type": "TEE",
+  "orientation": "E+N+S",
+  "node": [
+   58500,
+   0
+  ],
+  "fitting_handle": "407",
+  "block": "SCADA_V2$SCADA_TRAY_TEE_V2",
+  "expected_point": [
+   58500,
+   203.571449955
+  ],
+  "actual_point": [
+   58500,
+   203.5714657113
+  ],
+  "gap_mm": 1.57563e-05,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.57563e-05,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.8782e-06,
+   7.8782e-06
+  ],
+  "opening_distance_mm": 203.571449955,
+  "straight_start_diag_mm": 203.5714657113,
+  "straight_start_census_mm": 203.57146571,
+  "derived_joint_wcs": [
+   58500,
+   0
+  ],
+  "designed_node": [
+   58500,
+   0
+  ],
+  "candidate_entity_count": 14,
+  "matched_entity_handles": [
+   "407",
+   "50C",
+   "50B"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "B4_TEE_branch_E",
+  "joint_id": "B4_TEE_branch_E/N2/S",
+  "junction_type": "TEE",
+  "orientation": "E+N+S",
+  "node": [
+   58500,
+   0
+  ],
+  "fitting_handle": "407",
+  "block": "SCADA_V2$SCADA_TRAY_TEE_V2",
+  "expected_point": [
+   58500,
+   -203.571449955
+  ],
+  "actual_point": [
+   58500,
+   -203.5714657113
+  ],
+  "gap_mm": 1.57563e-05,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.57563e-05,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.8782e-06,
+   7.8782e-06
+  ],
+  "opening_distance_mm": 203.571449955,
+  "straight_start_diag_mm": 203.5714657113,
+  "straight_start_census_mm": 203.57146570999998,
+  "derived_joint_wcs": [
+   58500,
+   0
+  ],
+  "designed_node": [
+   58500,
+   0
+  ],
+  "candidate_entity_count": 14,
+  "matched_entity_handles": [
+   "407",
+   "503",
+   "502"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "C1_CROSS",
+  "joint_id": "C1_CROSS/N3/E",
+  "junction_type": "CROSS",
+  "orientation": "E+W+N+S",
+  "node": [
+   65000.0,
+   0.0
+  ],
+  "fitting_handle": "406",
+  "block": "SCADA_V2$SCADA_TRAY_CROSS_V2",
+  "expected_point": [
+   65203.5714285928,
+   0
+  ],
+  "actual_point": [
+   65203.5714286086,
+   0
+  ],
+  "gap_mm": 1.58e-08,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.58e-08,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.9e-09,
+   7.9e-09
+  ],
+  "opening_distance_mm": 203.5714285928,
+  "straight_start_diag_mm": 203.5714286086,
+  "straight_start_census_mm": 203.57142860999738,
+  "derived_joint_wcs": [
+   65000,
+   0
+  ],
+  "designed_node": [
+   65000.0,
+   0.0
+  ],
+  "candidate_entity_count": 17,
+  "matched_entity_handles": [
+   "406",
+   "4F3",
+   "4F2"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "C1_CROSS",
+  "joint_id": "C1_CROSS/N3/W",
+  "junction_type": "CROSS",
+  "orientation": "E+W+N+S",
+  "node": [
+   65000.0,
+   0.0
+  ],
+  "fitting_handle": "406",
+  "block": "SCADA_V2$SCADA_TRAY_CROSS_V2",
+  "expected_point": [
+   64796.4285714072,
+   0
+  ],
+  "actual_point": [
+   64796.4285713914,
+   0
+  ],
+  "gap_mm": 1.58e-08,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.58e-08,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.9e-09,
+   7.9e-09
+  ],
+  "opening_distance_mm": 203.5714285928,
+  "straight_start_diag_mm": 203.5714286086,
+  "straight_start_census_mm": 203.57142860999738,
+  "derived_joint_wcs": [
+   65000,
+   0
+  ],
+  "designed_node": [
+   65000.0,
+   0.0
+  ],
+  "candidate_entity_count": 17,
+  "matched_entity_handles": [
+   "406",
+   "4EA",
+   "4E9"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "C1_CROSS",
+  "joint_id": "C1_CROSS/N3/N",
+  "junction_type": "CROSS",
+  "orientation": "E+W+N+S",
+  "node": [
+   65000.0,
+   0.0
+  ],
+  "fitting_handle": "406",
+  "block": "SCADA_V2$SCADA_TRAY_CROSS_V2",
+  "expected_point": [
+   65000,
+   203.5714285928
+  ],
+  "actual_point": [
+   65000,
+   203.5714286086
+  ],
+  "gap_mm": 1.58e-08,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.58e-08,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.9e-09,
+   7.9e-09
+  ],
+  "opening_distance_mm": 203.5714285928,
+  "straight_start_diag_mm": 203.5714286086,
+  "straight_start_census_mm": 203.57142861,
+  "derived_joint_wcs": [
+   65000,
+   0
+  ],
+  "designed_node": [
+   65000.0,
+   0.0
+  ],
+  "candidate_entity_count": 17,
+  "matched_entity_handles": [
+   "406",
+   "4D0",
+   "4CF"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "C1_CROSS",
+  "joint_id": "C1_CROSS/N3/S",
+  "junction_type": "CROSS",
+  "orientation": "E+W+N+S",
+  "node": [
+   65000.0,
+   0.0
+  ],
+  "fitting_handle": "406",
+  "block": "SCADA_V2$SCADA_TRAY_CROSS_V2",
+  "expected_point": [
+   65000,
+   -203.5714285928
+  ],
+  "actual_point": [
+   65000,
+   -203.5714286086
+  ],
+  "gap_mm": 1.58e-08,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.58e-08,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.9e-09,
+   7.9e-09
+  ],
+  "opening_distance_mm": 203.5714285928,
+  "straight_start_diag_mm": 203.5714286086,
+  "straight_start_census_mm": 203.5714286100001,
+  "derived_joint_wcs": [
+   65000,
+   0
+  ],
+  "designed_node": [
+   65000.0,
+   0.0
+  ],
+  "candidate_entity_count": 17,
+  "matched_entity_handles": [
+   "406",
+   "4DD",
+   "4DC"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "D1_CHAIN",
+  "joint_id": "D1_CHAIN/N2/W",
+  "junction_type": "ELBOW",
+  "orientation": "W+N",
+  "node": [
+   4000,
+   10000
+  ],
+  "fitting_handle": "404",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   3844.8629973707,
+   10000
+  ],
+  "actual_point": [
+   3844.8629973707,
+   10000
+  ],
+  "gap_mm": 0.0,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": 0,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -4.0133e-06,
+   4.0133e-06
+  ],
+  "opening_distance_mm": 155.1370026293,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026300001,
+  "derived_joint_wcs": [
+   3999.9999919733,
+   10000
+  ],
+  "designed_node": [
+   4000,
+   10000
+  ],
+  "candidate_entity_count": 10,
+  "matched_entity_handles": [
+   "404",
+   "47E",
+   "47D"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "D1_CHAIN",
+  "joint_id": "D1_CHAIN/N2/N",
+  "junction_type": "ELBOW",
+  "orientation": "W+N",
+  "node": [
+   4000,
+   10000
+  ],
+  "fitting_handle": "404",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   3999.9999919735,
+   10155.1369946029
+  ],
+  "actual_point": [
+   4000,
+   10155.1370026293
+  ],
+  "gap_mm": 8.0265e-06,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -8.0265e-06,
+  "lateral_error_mm": 8.0265e-06,
+  "rail_center_differences_mm": [
+   4.0133e-06,
+   1.20398e-05
+  ],
+  "opening_distance_mm": 155.1369946028,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026299992,
+  "derived_joint_wcs": [
+   3999.9999919733,
+   10000
+  ],
+  "designed_node": [
+   4000,
+   10000
+  ],
+  "candidate_entity_count": 10,
+  "matched_entity_handles": [
+   "404",
+   "48F",
+   "48E"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "D1_CHAIN",
+  "joint_id": "D1_CHAIN/N3/E",
+  "junction_type": "TEE",
+  "orientation": "E+N+S",
+  "node": [
+   4000,
+   14000
+  ],
+  "fitting_handle": "403",
+  "block": "SCADA_V2$SCADA_TRAY_TEE_V2",
+  "expected_point": [
+   4203.571449955,
+   14000
+  ],
+  "actual_point": [
+   4203.5714657113,
+   14000
+  ],
+  "gap_mm": 1.57563e-05,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.57563e-05,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.8782e-06,
+   7.8782e-06
+  ],
+  "opening_distance_mm": 203.571449955,
+  "straight_start_diag_mm": 203.5714657113,
+  "straight_start_census_mm": 203.57146570999976,
+  "derived_joint_wcs": [
+   4000,
+   14000
+  ],
+  "designed_node": [
+   4000,
+   14000
+  ],
+  "candidate_entity_count": 13,
+  "matched_entity_handles": [
+   "403",
+   "471",
+   "470"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "D1_CHAIN",
+  "joint_id": "D1_CHAIN/N3/N",
+  "junction_type": "TEE",
+  "orientation": "E+N+S",
+  "node": [
+   4000,
+   14000
+  ],
+  "fitting_handle": "403",
+  "block": "SCADA_V2$SCADA_TRAY_TEE_V2",
+  "expected_point": [
+   4000,
+   14203.571449955
+  ],
+  "actual_point": [
+   4000,
+   14203.5714657113
+  ],
+  "gap_mm": 1.57563e-05,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.57563e-05,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.8782e-06,
+   7.8782e-06
+  ],
+  "opening_distance_mm": 203.571449955,
+  "straight_start_diag_mm": 203.5714657113,
+  "straight_start_census_mm": 203.57146570999976,
+  "derived_joint_wcs": [
+   4000,
+   14000
+  ],
+  "designed_node": [
+   4000,
+   14000
+  ],
+  "candidate_entity_count": 13,
+  "matched_entity_handles": [
+   "403",
+   "49F",
+   "49E"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "D1_CHAIN",
+  "joint_id": "D1_CHAIN/N3/S",
+  "junction_type": "TEE",
+  "orientation": "E+N+S",
+  "node": [
+   4000,
+   14000
+  ],
+  "fitting_handle": "403",
+  "block": "SCADA_V2$SCADA_TRAY_TEE_V2",
+  "expected_point": [
+   4000,
+   13796.428550045
+  ],
+  "actual_point": [
+   4000,
+   13796.4285342887
+  ],
+  "gap_mm": 1.57563e-05,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.57563e-05,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.8782e-06,
+   7.8782e-06
+  ],
+  "opening_distance_mm": 203.571449955,
+  "straight_start_diag_mm": 203.5714657113,
+  "straight_start_census_mm": 203.57146570999976,
+  "derived_joint_wcs": [
+   4000,
+   14000
+  ],
+  "designed_node": [
+   4000,
+   14000
+  ],
+  "candidate_entity_count": 13,
+  "matched_entity_handles": [
+   "403",
+   "48F",
+   "48E"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "D1_CHAIN",
+  "joint_id": "D1_CHAIN/N4/E",
+  "junction_type": "ELBOW",
+  "orientation": "E+S",
+  "node": [
+   4000,
+   18000
+  ],
+  "fitting_handle": "405",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   4155.1370026293,
+   18000
+  ],
+  "actual_point": [
+   4155.1370026293,
+   18000
+  ],
+  "gap_mm": 0.0,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": 0,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -4.0133e-06,
+   4.0133e-06
+  ],
+  "opening_distance_mm": 155.1370026293,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026300001,
+  "derived_joint_wcs": [
+   4000.0000080267,
+   18000
+  ],
+  "designed_node": [
+   4000,
+   18000
+  ],
+  "candidate_entity_count": 10,
+  "matched_entity_handles": [
+   "405",
+   "4AF",
+   "4AE"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "D1_CHAIN",
+  "joint_id": "D1_CHAIN/N4/S",
+  "junction_type": "ELBOW",
+  "orientation": "E+S",
+  "node": [
+   4000,
+   18000
+  ],
+  "fitting_handle": "405",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   4000.0000080265,
+   17844.8630053972
+  ],
+  "actual_point": [
+   4000,
+   17844.8629973707
+  ],
+  "gap_mm": 8.0265e-06,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -8.0265e-06,
+  "lateral_error_mm": 8.0265e-06,
+  "rail_center_differences_mm": [
+   4.0133e-06,
+   1.20398e-05
+  ],
+  "opening_distance_mm": 155.1369946028,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026299992,
+  "derived_joint_wcs": [
+   4000.0000080267,
+   18000
+  ],
+  "designed_node": [
+   4000,
+   18000
+  ],
+  "candidate_entity_count": 10,
+  "matched_entity_handles": [
+   "405",
+   "49F",
+   "49E"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "D1_CHAIN",
+  "joint_id": "D1_CHAIN/N7/E",
+  "junction_type": "CROSS",
+  "orientation": "E+W+N+S",
+  "node": [
+   9000.0,
+   18000.0
+  ],
+  "fitting_handle": "402",
+  "block": "SCADA_V2$SCADA_TRAY_CROSS_V2",
+  "expected_point": [
+   9203.5714285928,
+   18000
+  ],
+  "actual_point": [
+   9203.5714286086,
+   18000
+  ],
+  "gap_mm": 1.58e-08,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.58e-08,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.9e-09,
+   7.9e-09
+  ],
+  "opening_distance_mm": 203.5714285928,
+  "straight_start_diag_mm": 203.5714286086,
+  "straight_start_census_mm": 203.5714286099992,
+  "derived_joint_wcs": [
+   9000,
+   18000
+  ],
+  "designed_node": [
+   9000.0,
+   18000.0
+  ],
+  "candidate_entity_count": 16,
+  "matched_entity_handles": [
+   "402",
+   "4C3",
+   "4C2"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "D1_CHAIN",
+  "joint_id": "D1_CHAIN/N7/W",
+  "junction_type": "CROSS",
+  "orientation": "E+W+N+S",
+  "node": [
+   9000.0,
+   18000.0
+  ],
+  "fitting_handle": "402",
+  "block": "SCADA_V2$SCADA_TRAY_CROSS_V2",
+  "expected_point": [
+   8796.4285714072,
+   18000
+  ],
+  "actual_point": [
+   8796.4285713914,
+   18000
+  ],
+  "gap_mm": 1.58e-08,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.58e-08,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.9e-09,
+   7.9e-09
+  ],
+  "opening_distance_mm": 203.5714285928,
+  "straight_start_diag_mm": 203.5714286086,
+  "straight_start_census_mm": 203.5714286099992,
+  "derived_joint_wcs": [
+   9000,
+   18000
+  ],
+  "designed_node": [
+   9000.0,
+   18000.0
+  ],
+  "candidate_entity_count": 16,
+  "matched_entity_handles": [
+   "402",
+   "4AF",
+   "4AE"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "D1_CHAIN",
+  "joint_id": "D1_CHAIN/N7/N",
+  "junction_type": "CROSS",
+  "orientation": "E+W+N+S",
+  "node": [
+   9000.0,
+   18000.0
+  ],
+  "fitting_handle": "402",
+  "block": "SCADA_V2$SCADA_TRAY_CROSS_V2",
+  "expected_point": [
+   9000,
+   18203.5714285928
+  ],
+  "actual_point": [
+   9000,
+   18203.5714286086
+  ],
+  "gap_mm": 1.58e-08,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.58e-08,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.9e-09,
+   7.9e-09
+  ],
+  "opening_distance_mm": 203.5714285928,
+  "straight_start_diag_mm": 203.5714286086,
+  "straight_start_census_mm": 203.57142861000102,
+  "derived_joint_wcs": [
+   9000,
+   18000
+  ],
+  "designed_node": [
+   9000.0,
+   18000.0
+  ],
+  "candidate_entity_count": 16,
+  "matched_entity_handles": [
+   "402",
+   "464",
+   "463"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "D1_CHAIN",
+  "joint_id": "D1_CHAIN/N7/S",
+  "junction_type": "CROSS",
+  "orientation": "E+W+N+S",
+  "node": [
+   9000.0,
+   18000.0
+  ],
+  "fitting_handle": "402",
+  "block": "SCADA_V2$SCADA_TRAY_CROSS_V2",
+  "expected_point": [
+   9000,
+   17796.4285714072
+  ],
+  "actual_point": [
+   9000,
+   17796.4285713914
+  ],
+  "gap_mm": 1.58e-08,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -1.58e-08,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -7.9e-09,
+   7.9e-09
+  ],
+  "opening_distance_mm": 203.5714285928,
+  "straight_start_diag_mm": 203.5714286086,
+  "straight_start_census_mm": 203.57142861000102,
+  "derived_joint_wcs": [
+   9000,
+   18000
+  ],
+  "designed_node": [
+   9000.0,
+   18000.0
+  ],
+  "candidate_entity_count": 16,
+  "matched_entity_handles": [
+   "402",
+   "457",
+   "456"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "E1_TURNS_long",
+  "joint_id": "E1_TURNS_long/N2/E",
+  "junction_type": "ELBOW",
+  "orientation": "E+N",
+  "node": [
+   500,
+   33000
+  ],
+  "fitting_handle": "401",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   655.1369946028,
+   33000.0000080265
+  ],
+  "actual_point": [
+   655.1370026293,
+   33000
+  ],
+  "gap_mm": 8.0265e-06,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -8.0265e-06,
+  "lateral_error_mm": 8.0265e-06,
+  "rail_center_differences_mm": [
+   4.0133e-06,
+   1.20398e-05
+  ],
+  "opening_distance_mm": 155.1369946028,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.13700262999998,
+  "derived_joint_wcs": [
+   500,
+   33000.0000080267
+  ],
+  "designed_node": [
+   500,
+   33000
+  ],
+  "candidate_entity_count": 9,
+  "matched_entity_handles": [
+   "401",
+   "440",
+   "43F"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "E1_TURNS_long",
+  "joint_id": "E1_TURNS_long/N2/N",
+  "junction_type": "ELBOW",
+  "orientation": "E+N",
+  "node": [
+   500,
+   33000
+  ],
+  "fitting_handle": "401",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   500,
+   33155.1370026293
+  ],
+  "actual_point": [
+   500,
+   33155.1370026294
+  ],
+  "gap_mm": 0.0,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": 0,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -4.0133e-06,
+   4.0133e-06
+  ],
+  "opening_distance_mm": 155.1370026293,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026299992,
+  "derived_joint_wcs": [
+   500,
+   33000.0000080267
+  ],
+  "designed_node": [
+   500,
+   33000
+  ],
+  "candidate_entity_count": 9,
+  "matched_entity_handles": [
+   "401",
+   "44A",
+   "449"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "E1_TURNS_long",
+  "joint_id": "E1_TURNS_long/N4/W",
+  "junction_type": "ELBOW",
+  "orientation": "W+N",
+  "node": [
+   3000,
+   30000
+  ],
+  "fitting_handle": "3FF",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   2844.8629973707,
+   30000
+  ],
+  "actual_point": [
+   2844.8629973707,
+   30000
+  ],
+  "gap_mm": 0.0,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": 0,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -4.0133e-06,
+   4.0133e-06
+  ],
+  "opening_distance_mm": 155.1370026293,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026300001,
+  "derived_joint_wcs": [
+   2999.9999919733,
+   30000
+  ],
+  "designed_node": [
+   3000,
+   30000
+  ],
+  "candidate_entity_count": 10,
+  "matched_entity_handles": [
+   "3FF",
+   "427",
+   "426"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "E1_TURNS_long",
+  "joint_id": "E1_TURNS_long/N4/N",
+  "junction_type": "ELBOW",
+  "orientation": "W+N",
+  "node": [
+   3000,
+   30000
+  ],
+  "fitting_handle": "3FF",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   2999.9999919735,
+   30155.1369946029
+  ],
+  "actual_point": [
+   3000,
+   30155.1370026293
+  ],
+  "gap_mm": 8.0265e-06,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -8.0265e-06,
+  "lateral_error_mm": 8.0265e-06,
+  "rail_center_differences_mm": [
+   4.0133e-06,
+   1.20398e-05
+  ],
+  "opening_distance_mm": 155.1369946028,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026299992,
+  "derived_joint_wcs": [
+   2999.9999919733,
+   30000
+  ],
+  "designed_node": [
+   3000,
+   30000
+  ],
+  "candidate_entity_count": 10,
+  "matched_entity_handles": [
+   "3FF",
+   "434",
+   "433"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "E1_TURNS_long",
+  "joint_id": "E1_TURNS_long/N5/W",
+  "junction_type": "ELBOW",
+  "orientation": "W+S",
+  "node": [
+   3000,
+   33000
+  ],
+  "fitting_handle": "400",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   2844.8630053972,
+   32999.9999919735
+  ],
+  "actual_point": [
+   2844.8629973707,
+   33000
+  ],
+  "gap_mm": 8.0265e-06,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -8.0265e-06,
+  "lateral_error_mm": 8.0265e-06,
+  "rail_center_differences_mm": [
+   4.0133e-06,
+   1.20398e-05
+  ],
+  "opening_distance_mm": 155.1369946028,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026300001,
+  "derived_joint_wcs": [
+   3000,
+   32999.9999919734
+  ],
+  "designed_node": [
+   3000,
+   33000
+  ],
+  "candidate_entity_count": 9,
+  "matched_entity_handles": [
+   "400",
+   "440",
+   "43F"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "E1_TURNS_long",
+  "joint_id": "E1_TURNS_long/N5/S",
+  "junction_type": "ELBOW",
+  "orientation": "W+S",
+  "node": [
+   3000,
+   33000
+  ],
+  "fitting_handle": "400",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   3000,
+   32844.8629973707
+  ],
+  "actual_point": [
+   3000,
+   32844.8629973707
+  ],
+  "gap_mm": 0.0,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": 0,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -4.0133e-06,
+   4.0133e-06
+  ],
+  "opening_distance_mm": 155.1370026293,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026299992,
+  "derived_joint_wcs": [
+   3000,
+   32999.9999919734
+  ],
+  "designed_node": [
+   3000,
+   33000
+  ],
+  "candidate_entity_count": 9,
+  "matched_entity_handles": [
+   "400",
+   "434",
+   "433"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "E2_TURNS_short",
+  "joint_id": "E2_TURNS_short/N2/E",
+  "junction_type": "ELBOW",
+  "orientation": "E+N",
+  "node": [
+   11510,
+   30490
+  ],
+  "fitting_handle": "3FE",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   11665.1369946029,
+   30490.0000080266
+  ],
+  "actual_point": [
+   11665.1370026293,
+   30490
+  ],
+  "gap_mm": 8.0265e-06,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -8.0265e-06,
+  "lateral_error_mm": 8.0265e-06,
+  "rail_center_differences_mm": [
+   4.0133e-06,
+   1.20398e-05
+  ],
+  "opening_distance_mm": 155.1369946028,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026299992,
+  "derived_joint_wcs": [
+   11510,
+   30490.0000080267
+  ],
+  "designed_node": [
+   11510,
+   30490
+  ],
+  "candidate_entity_count": 16,
+  "matched_entity_handles": [
+   "3FE",
+   "41B",
+   "41A"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "E2_TURNS_short",
+  "joint_id": "E2_TURNS_short/N2/N",
+  "junction_type": "ELBOW",
+  "orientation": "E+N",
+  "node": [
+   11510,
+   30490
+  ],
+  "fitting_handle": "3FE",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   11510,
+   30645.1370026293
+  ],
+  "actual_point": [
+   11510,
+   30645.1370026293
+  ],
+  "gap_mm": 0.0,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": 0,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -4.0133e-06,
+   4.0133e-06
+  ],
+  "opening_distance_mm": 155.1370026293,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026299992,
+  "derived_joint_wcs": [
+   11510,
+   30490.0000080267
+  ],
+  "designed_node": [
+   11510,
+   30490
+  ],
+  "candidate_entity_count": 16,
+  "matched_entity_handles": [
+   "3FE",
+   "41D",
+   "41C"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "E2_TURNS_short",
+  "joint_id": "E2_TURNS_short/N4/W",
+  "junction_type": "ELBOW",
+  "orientation": "W+N",
+  "node": [
+   12000,
+   30000
+  ],
+  "fitting_handle": "3FC",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   11844.8629973707,
+   30000
+  ],
+  "actual_point": [
+   11844.8629973707,
+   30000
+  ],
+  "gap_mm": 0.0,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": 0,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -4.0133e-06,
+   4.0133e-06
+  ],
+  "opening_distance_mm": 155.1370026293,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026299992,
+  "derived_joint_wcs": [
+   11999.9999919734,
+   30000
+  ],
+  "designed_node": [
+   12000,
+   30000
+  ],
+  "candidate_entity_count": 12,
+  "matched_entity_handles": [
+   "3FC",
+   "410",
+   "40F"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "E2_TURNS_short",
+  "joint_id": "E2_TURNS_short/N4/N",
+  "junction_type": "ELBOW",
+  "orientation": "W+N",
+  "node": [
+   12000,
+   30000
+  ],
+  "fitting_handle": "3FC",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   11999.9999919735,
+   30155.1369946029
+  ],
+  "actual_point": [
+   12000,
+   30155.1370026293
+  ],
+  "gap_mm": 8.0265e-06,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -8.0265e-06,
+  "lateral_error_mm": 8.0265e-06,
+  "rail_center_differences_mm": [
+   4.0133e-06,
+   1.20398e-05
+  ],
+  "opening_distance_mm": 155.1369946028,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026299992,
+  "derived_joint_wcs": [
+   11999.9999919734,
+   30000
+  ],
+  "designed_node": [
+   12000,
+   30000
+  ],
+  "candidate_entity_count": 12,
+  "matched_entity_handles": [
+   "3FC",
+   "419",
+   "418"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "E2_TURNS_short",
+  "joint_id": "E2_TURNS_short/N5/W",
+  "junction_type": "ELBOW",
+  "orientation": "W+S",
+  "node": [
+   12000,
+   30490
+  ],
+  "fitting_handle": "3FD",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   11844.8630053972,
+   30489.9999919735
+  ],
+  "actual_point": [
+   11844.8629973707,
+   30490
+  ],
+  "gap_mm": 8.0265e-06,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": -8.0265e-06,
+  "lateral_error_mm": 8.0265e-06,
+  "rail_center_differences_mm": [
+   4.0133e-06,
+   1.20398e-05
+  ],
+  "opening_distance_mm": 155.1369946028,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026299992,
+  "derived_joint_wcs": [
+   12000,
+   30489.9999919734
+  ],
+  "designed_node": [
+   12000,
+   30490
+  ],
+  "candidate_entity_count": 15,
+  "matched_entity_handles": [
+   "3FD",
+   "41B",
+   "41A"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ },
+ {
+  "case_id": "E2_TURNS_short",
+  "joint_id": "E2_TURNS_short/N5/S",
+  "junction_type": "ELBOW",
+  "orientation": "W+S",
+  "node": [
+   12000,
+   30490
+  ],
+  "fitting_handle": "3FD",
+  "block": "SCADA_V2$SCADA_TRAY_ELBOW_V2",
+  "expected_point": [
+   12000,
+   30334.8629973707
+  ],
+  "actual_point": [
+   12000,
+   30334.8629973707
+  ],
+  "gap_mm": 0.0,
+  "overlap_mm": 0.0,
+  "axial_residual_mm": 0,
+  "lateral_error_mm": 0,
+  "rail_center_differences_mm": [
+   -4.0133e-06,
+   4.0133e-06
+  ],
+  "opening_distance_mm": 155.1370026293,
+  "straight_start_diag_mm": 155.1370026293,
+  "straight_start_census_mm": 155.1370026299992,
+  "derived_joint_wcs": [
+   12000,
+   30489.9999919734
+  ],
+  "designed_node": [
+   12000,
+   30490
+  ],
+  "candidate_entity_count": 15,
+  "matched_entity_handles": [
+   "3FD",
+   "419",
+   "418"
+  ],
+  "centerline_status": "PASS",
+  "insert_status": "PASS",
+  "trim_status": "PASS",
+  "gap_overlap_status": "PASS",
+  "status": "PASS"
+ }
+]

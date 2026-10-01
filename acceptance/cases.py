@@ -6,8 +6,11 @@ independently of the Router, the diagnostics tool and AutoCAD.  Width scope: 300
 from __future__ import annotations
 
 import math
+import os
 
-WIDTH = 300.0
+WIDTH = float(os.environ.get("ACC_WIDTH", "300"))   # 150 / 300 / 450 / 600 (Router-supported presets)
+ELBOW_TAKEOFF_BLOCK = 644.2667 * WIDTH / 622.9333        # Router committed Elbow TAKEOFF scaled to the width (documentation of the design input only)
+SHORT = round(2 * ELBOW_TAKEOFF_BLOCK + 179.5)           # middle segment that leaves a ~179.5 mm Straight (=800 at 300 mm)
 PROFILE = "SCADA_V2"
 
 # case id -> dict(window=(xmin,xmax,ymin,ymax), paths=[[(x,y),...],...], note)
@@ -41,8 +44,8 @@ CASES: dict[str, dict] = {
     # Case E: consecutive direction changes  East -> North -> West -> North
     "E1_TURNS_long": dict(window=(-1000, 4500, 28000, 37000), note="E,N,W,N turns, long middle segments",
                           paths=[[(0, 30000), (3000, 30000), (3000, 33000), (500, 33000), (500, 36000)]]),
-    "E2_TURNS_short": dict(window=(9000, 13500, 28000, 37000), note="E,N,W,N turns, short middle segments (800 mm)",
-                           paths=[[(10000, 30000), (12000, 30000), (12000, 30800), (11200, 30800), (11200, 33000)]]),
+    "E2_TURNS_short": dict(window=(9000, 13500, 28000, 37000), note="E,N,W,N turns, short middle segments (2 x elbow takeoff + 179.5 mm; 800 mm at 300)",
+                           paths=[[(10000, 30000), (12000, 30000), (12000, 30000 + SHORT), (12000 - SHORT, 30000 + SHORT), (12000 - SHORT, 33000 + SHORT - 800)]]),
 }
 
 

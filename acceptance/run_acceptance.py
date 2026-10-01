@@ -1,4 +1,4 @@
-"""SCADA_V2 @ 300 mm integration acceptance (engine part, items 1-8).  Width scope: 300 mm ONLY.
+"""SCADA_V2 integration acceptance (engine part, items 1-8) for ONE width per run: ACC_WIDTH=150|300|450|600 (default 300).
 
     python acceptance/run_acceptance.py            # build (if needed), diagnose, census, analyse, write evidence/
     python acceptance/run_acceptance.py --rebuild  # rebuild the acceptance DWG first
@@ -27,12 +27,14 @@ import accore_run  # noqa: E402
 import build_drawing  # noqa: E402
 from cases import CASES, WIDTH, topology, direction  # noqa: E402
 
-DWG = HERE / "scada_v2_300_acceptance.dwg"
-EVID = HERE / "evidence"
+W_TAG = "" if WIDTH == 300.0 else "_%d" % WIDTH
+DWG = HERE / ("scada_v2_%d_acceptance.dwg" % WIDTH)
+EVID = HERE / ("evidence" + W_TAG)
 ROUTER_DIR = Path(r"D:\github\ezdxf\scada-v2-block-integration\router")
 TOL = 0.01            # mm; = diagnostics connection_exact_mm
 RAIL_T, RUNG_W, RUNG_SP, RUNG_FIRST = 20.0, 40.0, 250.0, 125.0   # documented Router ladder rule (cable_tray_router.lsp)
 RUNG_HALF = WIDTH / 2 - RAIL_T     # Router ctr-draw-straight-ladder: rung lateral half-length = width/2 - thickness
+RAIL_OUTER = WIDTH / 2 + RAIL_T / 2
 RAIL_INNER = WIDTH / 2 - RAIL_T / 2 # rail centre-line at +-width/2, thickness 20 -> inner edge at +-140
 ZONE = 700.0          # candidate-entity radius around a junction, mm
 OPP = {"E": "W", "W": "E", "N": "S", "S": "N"}
@@ -179,7 +181,7 @@ def analyse(diag, census, baseline_census):
             span = (d_p, L - d_q)
             exp = []
             if span[1] - span[0] > TOL:
-                exp += [("rail", span[0], span[1], 140.0, 160.0), ("rail", span[0], span[1], -160.0, -140.0)]
+                exp += [("rail", span[0], span[1], RAIL_INNER, RAIL_OUTER), ("rail", span[0], span[1], -RAIL_OUTER, -RAIL_INNER)]
                 for k in range(int((span[1] - span[0] + 1e-4) / RUNG_SP)):
                     c0 = span[0] + RUNG_FIRST + RUNG_SP * k
                     exp.append(("rung", c0 - RUNG_W / 2, c0 + RUNG_W / 2, -RUNG_HALF, RUNG_HALF))
@@ -189,7 +191,7 @@ def analyse(diag, census, baseline_census):
             owner = None
             for k, ei in enumerate(edge_info):
                 a0, a1, l0, l1 = tile_extents(t["verts"], ei["p"], ei["u"], ei["n"])
-                if -1.0 <= (a0 + a1) / 2 <= ei["L"] + 1.0 and abs((l0 + l1) / 2) <= 170.0:
+                if -1.0 <= (a0 + a1) / 2 <= ei["L"] + 1.0 and abs((l0 + l1) / 2) <= RAIL_OUTER + 10.0:
                     owner = k
                     owned[k].append((t, (a0, a1, l0, l1)))
                     break
@@ -351,7 +353,7 @@ def main():
     m = re.search(r"RESULT: (\d+) passed, (\d+) failed", reg.stdout)
     extra = dict(router_regression=dict(passed=int(m.group(1)), failed=int(m.group(2))) if m else "UNPARSEABLE",
                  router_sha=hashlib.sha256((ROUTER_DIR / "cable_tray_router.lsp").read_bytes()).hexdigest(),
-                 diagnostics_items_9_10="PENDING HUMAN GUI", width_scope="300 mm only; other widths NOT VERIFIED")
+                 diagnostics_items_9_10="PENDING HUMAN GUI", width_scope="%d mm (this run only)" % WIDTH)
     write_outputs(res, diag, info, extra)
     acc = res["accounting"]
     print("DWG", DWG, "sha256 before/after", info["source_sha_before"][:16], info["source_sha_after"][:16])
