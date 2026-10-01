@@ -1261,7 +1261,7 @@
 (defun ard:z-normal-p (e)
   (and e (< (abs (car e)) 1.0e-9) (< (abs (cadr e)) 1.0e-9) (> (caddr e) 0.0)))
 (defun ard:analyze-fitting (fit / ip bb ref refsrc rank best second jn cand spts conns issues
-                                 status maxerr c e ang k g blk rel local ops opws op used unp jb m)
+                                 status maxerr c e ang k g blk rel local ops opws op used unp jb m stacked)
   (setq ip (ard:get "_ip" fit))
   (setq bb (ard:bbox-of (ard:get "_pts" fit)))
   (setq ref (if bb
@@ -1296,9 +1296,10 @@
         (setq issues (cons (ard:issue "WARN" "OPENING_NOT_DERIVED"
                              "no opening could be derived from the block geometry; the weak extreme-face fallback was used") issues)))
       (setq conns (reverse conns))
+      (setq stacked (vl-some '(lambda (o) (cdr (assoc "amb" o))) opws))   ; block with stacked variants: its other openings are not trustworthy either
       (foreach o opws
         (if (and (not (member (cdr (assoc "id" o)) used)) (not (cdr (assoc "amb" o))))
-          (setq issues (cons (ard:issue "FAIL" "OPENING_WITHOUT_ARM"
+          (setq issues (cons (ard:issue (if stacked "WARN" "FAIL") (if stacked "OPENING_UNPAIRED_IN_STACKED_BLOCK" "OPENING_WITHOUT_ARM")
             (strcat "fitting opening " (cdr (assoc "id" o)) " at (" (rtos (car (cdr (assoc "center" o))) 2 3) ", "
                     (rtos (cadr (cdr (assoc "center" o))) 2 3) ") faces "
                     (ard:dir-label (car (cdr (assoc "normal" o))) (cadr (cdr (assoc "normal" o))))

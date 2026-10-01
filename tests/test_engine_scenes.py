@@ -666,3 +666,19 @@ class AmbiguityAndShortSegments(unittest.TestCase):
         for f in r["fittings"]:
             self.assertEqual(f["status"], "WARN")
             self.assertNotIn("CONNECTION_MISMATCH", codes(f))
+
+
+class StackedBlockUnpairedOpening(unittest.TestCase):
+    def test_unpaired_opening_in_a_stacked_variant_block_is_a_warning(self):
+        """TEST_V3.dwg: the SCADA_BASIC TEE block stacks variants and also has a clean opening facing away from every arm."""
+        f = fit("stacked-unpaired")
+        self.assertIn("OPENING_UNPAIRED_IN_STACKED_BLOCK", codes(f))
+        self.assertNotIn("OPENING_WITHOUT_ARM", codes(f))
+        sev = {i["code"]: i["severity"] for i in f["issues"]}
+        self.assertEqual(sev["OPENING_UNPAIRED_IN_STACKED_BLOCK"], "WARN")
+        self.assertEqual(f["status"], "WARN")
+
+    def test_unpaired_opening_in_a_clean_block_is_still_a_failure(self):
+        f = fit("rot-error")
+        self.assertIn("OPENING_WITHOUT_ARM", codes(f))
+        self.assertEqual(f["status"], "FAIL")

@@ -25,7 +25,7 @@ SCENES = [
     "topology-mismatch", "readonly", "unsupported-path-entity", "extrusion-insert", "xdata-tag-fitting",
     "future-profile", "not-a-fitting", "curved-r1", "curved-r3-shifted-pivot",
     "curved-router-assumption", "curved-takeoff-at-tangent", "curved-decoy", "curved-rot-error",
-    "stacked-variants", "no-caps", "short-segment",
+    "stacked-variants", "no-caps", "short-segment", "stacked-unpaired",
 ]
 _cache: dict = {}
 
