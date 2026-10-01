@@ -44,6 +44,8 @@
       ard:th-corridor 30.0     ; extra half-width around an arm ray when picking geometry, mm
       ard:th-face 0.5          ; end-face band: points within this of the extreme, mm
       ard:th-arc-deg 7.5       ; arc sampling step, degrees
+      ard:th-geom-rel 1.0e-5   ; block-geometry tolerance = this * block bbox diagonal (block units)
+      ard:th-open-dir-deg 0.5  ; an opening 'faces' an arm when its outward normal is within this angle
       ard:th-cand-max 10)      ; PATH candidates listed per fitting
 
 ;;; ---- run state ---------------------------------------------------
@@ -354,6 +356,12 @@
     (if (not (member r (cdr cell)))
       (setq ard:*ga* (subst (cons (car cell) (append (cdr cell) (list r))) cell ard:*ga*)))
     (setq ard:*ga* (append ard:*ga* (list (list c r))))))
+(defun ard:note-seg (p q)
+  (setq ard:*gl* (cons (list (list (car p) (cadr p)) (list (car q) (cadr q))) ard:*gl*)))
+(defun ard:note-arc-rec (m c r a0 a1 / k rot)
+  (setq k (sqrt (+ (* (nth 0 m) (nth 0 m)) (* (nth 1 m) (nth 1 m))))
+        rot (atan (nth 1 m) (nth 0 m)))
+  (setq ard:*gr* (cons (list (ard:mat-apply m c) (* r k) (+ a0 rot) (+ a1 rot)) ard:*gr*)))
 (defun ard:tally (key / cell)
   (if (setq cell (assoc key ard:*gs*))
     (setq ard:*gs* (subst (cons key (1+ (cdr cell))) cell ard:*gs*))
@@ -387,15 +395,21 @@
   (cond
     ((= typ "LINE")
      (ard:tally typ)
+     (ard:note-seg (ard:mat-apply m (cdr (assoc 10 ed))) (ard:mat-apply m (cdr (assoc 11 ed))))
      (list (ard:mat-apply m (cdr (assoc 10 ed))) (ard:mat-apply m (cdr (assoc 11 ed)))))
     ((= typ "LWPOLYLINE")
      (ard:tally typ)
      (setq v (ard:lw-raw ed))
      (foreach c v
-       (if prev (setq pts (append (ard:bulge-pts prev c (caddr prev) m) pts)))
+       (if prev
+         (progn
+           (setq pts (append (ard:bulge-pts prev c (caddr prev) m) pts))
+           (if (< (abs (caddr prev)) 1.0e-9) (ard:note-seg (ard:mat-apply m prev) (ard:mat-apply m c)))))
        (setq prev c))
      (if (and prev (cdr v) (= 1 (logand 1 (if (assoc 70 ed) (cdr (assoc 70 ed)) 0))))
-       (setq pts (append (ard:bulge-pts prev (car v) (caddr prev) m) pts)))
+       (progn
+         (setq pts (append (ard:bulge-pts prev (car v) (caddr prev) m) pts))
+         (if (< (abs (caddr prev)) 1.0e-9) (ard:note-seg (ard:mat-apply m prev) (ard:mat-apply m (car v))))))
      (if (and v (null (cdr v))) (setq pts (list (ard:mat-apply m (car v)))))
      pts)
     ((= typ "ARC")
@@ -403,6 +417,7 @@
      (ard:note-arc (ard:mat-apply m (cdr (assoc 10 ed))) (cdr (assoc 40 ed)))
      (setq c (cdr (assoc 10 ed)) r (cdr (assoc 40 ed))
            a0 (cdr (assoc 50 ed)) a1 (cdr (assoc 51 ed)) th (- a1 a0))
+     (ard:note-arc-rec m c r a0 a1)
      (while (<= th 0.0) (setq th (+ th (* 2.0 pi))))
      (ard:arc-pts (car c) (cadr c) r a0 th m))
     ((= typ "CIRCLE")
@@ -432,16 +447,155 @@
             (setq en (entnext en)))))
       pts)
     nil))
-;;; -> (block-found local-points tally); cached per block name
-(defun ard:block-local (name / hit ard:*gs* ard:*ga* pts found)
+;;; -> (block-found local-points tally arc-centres straight-segments arc-records openings joint); cached per block name
+(defun ard:block-local (name / hit ard:*gs* ard:*ga* ard:*gl* ard:*gr* pts found segs ops)
   (if (setq hit (assoc name ard:*bcache*))
     (cdr hit)
     (progn
-      (setq ard:*gs* nil ard:*ga* nil found (if (tblobjname "BLOCK" name) T nil))
+      (setq ard:*gs* nil ard:*ga* nil ard:*gl* nil ard:*gr* nil found (if (tblobjname "BLOCK" name) T nil))
       (setq pts (if found (ard:block-pts name (list 1.0 0.0 0.0 1.0 0.0 0.0) 0) nil))
-      (setq hit (list found pts ard:*gs* ard:*ga*))
+      (setq segs (ard:dedupe-segs (reverse ard:*gl*) (ard:geom-tol pts)))
+      (setq ops (ard:derive-openings segs pts))
+      (setq hit (list found pts ard:*gs* ard:*ga* segs (reverse ard:*gr*) ops (ard:axis-joint ops)))
       (setq ard:*bcache* (cons (cons name hit) ard:*bcache*))
       hit)))
+;;; ====================================================================
+;;; 4b. cable-tray OPENINGS derived from block geometry (no hard-coded sizes)
+;;;
+;;; An opening is where a tray arm ends.  It is recognised from geometry evidence only:
+;;;   * two CAP segments: equal length, collinear, separated by a gap wider than the cap
+;;;     (the two rail end edges),
+;;;   * each cap endpoint is attached to a perpendicular RAIL EDGE running to the same side,
+;;;   * nothing of the block lies beyond the cap line inside the strip spanned by the caps.
+;;; Per opening (block coordinates): for each rail the outer edge (extreme endpoint of the cap),
+;;; the inner edge (the other endpoint) and the rail centre (their midpoint); the opening centre is
+;;; the midpoint of the two rail centres; the outward normal points away from the rails.
+;;; The farthest point of the block is NEVER used.
+;;; ====================================================================
+(defun ard:vdot (a b) (+ (* (car a) (car b)) (* (cadr a) (cadr b))))
+(defun ard:vlen (a) (sqrt (ard:vdot a a)))
+(defun ard:vsub (a b) (list (- (car a) (car b)) (- (cadr a) (cadr b))))
+(defun ard:vunit (a / l) (setq l (ard:vlen a)) (if (< l 1.0e-12) nil (list (/ (car a) l) (/ (cadr a) l))))
+(defun ard:vperp (u) (list (- (cadr u)) (car u)))
+(defun ard:vpt (o u s) (list (+ (car o) (* (car u) s)) (+ (cadr o) (* (cadr u) s))))
+(defun ard:geom-tol (pts / bb diag)
+  (setq bb (ard:bbox-of pts))
+  (setq diag (if bb (ard:d2 (car bb) (cadr bb)) 1.0))
+  (max 1.0e-9 (* ard:th-geom-rel diag)))
+(defun ard:dedupe-segs (segs tol / out s hit o)
+  (foreach s segs
+    (setq hit nil)
+    (foreach o out
+      (if (or (and (< (ard:d2 (car s) (car o)) tol) (< (ard:d2 (cadr s) (cadr o)) tol))
+              (and (< (ard:d2 (car s) (cadr o)) tol) (< (ard:d2 (cadr s) (car o)) tol)))
+        (setq hit T)))
+    (if (and (not hit) (> (ard:d2 (car s) (cadr s)) tol)) (setq out (cons s out))))
+  (reverse out))
+;;; signed extents (along n) of segments that touch pt and run perpendicular to u
+(defun ard:attached (pt segs skip u n tol / out s far d l)
+  (foreach s segs
+    (if (not (member s skip))
+      (progn
+        (setq far (cond ((< (ard:d2 (car s) pt) tol) (cadr s))
+                        ((< (ard:d2 (cadr s) pt) tol) (car s))
+                        (T nil)))
+        (if far
+          (progn
+            (setq d (ard:vsub far pt) l (ard:vlen d))
+            (if (and (> l tol) (< (/ (abs (ard:vdot d u)) l) 1.0e-3))
+              (setq out (cons (ard:vdot d n) out))))))))
+  out)
+(defun ard:same-side (exts / sg ok e)
+  ;; every attached extent must lie on one side; returns +1 / -1 / nil
+  (setq ok T)
+  (foreach e exts
+    (if (null sg)
+      (setq sg (if (> e 0.0) 1.0 -1.0))
+      (if (/= sg (if (> e 0.0) 1.0 -1.0)) (setq ok nil))))
+  (if ok sg nil))
+(defun ard:make-opening (o u n sv side / s1 s2 s3 s4 outw ss)
+  ;; sv = the 4 cap endpoint coordinates along u (from origin o)
+  (setq ss (vl-sort sv '<) s1 (nth 0 ss) s2 (nth 1 ss) s3 (nth 2 ss) s4 (nth 3 ss))
+  (setq outw (ard:vunit (list (* (- side) (car n)) (* (- side) (cadr n)))))
+  (list (cons "center" (ard:vpt o u (/ (+ s1 s2 s3 s4) 4.0)))
+        (cons "normal" outw)
+        (cons "u" u)
+        (cons "rails"
+          (list (list (ard:vpt o u s1) (ard:vpt o u s2) (ard:vpt o u (/ (+ s1 s2) 2.0)))
+                (list (ard:vpt o u s4) (ard:vpt o u s3) (ard:vpt o u (/ (+ s3 s4) 2.0)))))
+        (cons "width_center_to_center" (/ (- (+ s3 s4) (+ s1 s2)) 2.0))
+        (cons "width_outer" (- s4 s1))
+        (cons "width_inner" (- s3 s2))
+        (cons "cap_length" (- s2 s1))))
+(defun ard:opening-angle (op / nv a)
+  (setq nv (cdr (assoc "normal" op)) a (atan (cadr nv) (car nv)))
+  (if (< a 0.0) (+ a (* 2.0 pi)) a))
+(defun ard:derive-openings (sg pts / tol tl tc n i j si sj li lj ui nn o sj1 sj2 lo hi gap
+                                      ends exts side ok sv smin smax p d sp op ops dup q k)
+  (setq tol (ard:geom-tol pts) tl (* 20.0 tol) tc (* 5.0 tol) n (length sg))
+  (setq i 0)
+  (while (< i n)
+    (setq si (nth i sg) li (ard:d2 (car si) (cadr si)) ui (ard:vunit (ard:vsub (cadr si) (car si))))
+    (setq nn (ard:vperp ui) o (car si) j (1+ i))
+    (while (< j n)
+      (setq sj (nth j sg) lj (ard:d2 (car sj) (cadr sj)))
+      (if (and (< (abs (- li lj)) tl)
+               (< (abs (ard:vdot (ard:vsub (car sj) o) nn)) tc)
+               (< (abs (ard:vdot (ard:vsub (cadr sj) o) nn)) tc))
+        (progn
+          (setq sj1 (ard:vdot (ard:vsub (car sj) o) ui) sj2 (ard:vdot (ard:vsub (cadr sj) o) ui)
+                lo (min sj1 sj2) hi (max sj1 sj2)
+                gap (max (- lo li) (- hi)))
+          (if (> gap li)
+            (progn
+              (setq ends (list (car si) (cadr si) (car sj) (cadr sj)) exts nil ok T)
+              (foreach p ends
+                (setq k (ard:attached p sg (list si sj) ui nn tc))
+                (if k (setq exts (append k exts)) (setq ok nil)))
+              (setq side (if ok (ard:same-side exts) nil))
+              (if side
+                (progn
+                  (setq sv (list 0.0 li sj1 sj2) smin (apply 'min sv) smax (apply 'max sv))
+                  (setq op (ard:make-opening o ui nn sv side))
+                  (foreach p pts
+                    (setq d (ard:vdot (ard:vsub p o) (cdr (assoc "normal" op)))
+                          sp (ard:vdot (ard:vsub p o) ui))
+                    (if (and (> d tc) (>= sp (- smin tc)) (<= sp (+ smax tc))) (setq ok nil)))
+                  (if ok
+                    (progn
+                      (setq dup nil)
+                      (foreach q ops
+                        (if (and (< (ard:d2 (cdr (assoc "center" q)) (cdr (assoc "center" op))) tc)
+                                 (< (ard:d2 (cdr (assoc "normal" q)) (cdr (assoc "normal" op))) 1.0e-6))
+                          (setq dup T)))
+                      (if (not dup) (setq ops (cons op ops)))))))))))
+      (setq j (1+ j)))
+    (setq i (1+ i)))
+  (setq ops (vl-sort ops '(lambda (a b) (< (ard:opening-angle a) (ard:opening-angle b)))))
+  (setq i 0)
+  (mapcar '(lambda (op) (setq i (1+ i)) (cons (cons "id" (strcat "O" (itoa i))) op)) ops))
+;;; least-squares point closest to all opening axes (centre + t * normal); -> (pt rms) or nil
+(defun ard:axis-joint (ops / sxx sxy syy bx by op nv c det x y rms cnt dd)
+  (if (< (length ops) 2)
+    nil
+    (progn
+      (setq sxx 0.0 sxy 0.0 syy 0.0 bx 0.0 by 0.0)
+      (foreach op ops
+        (setq nv (cdr (assoc "normal" op)) c (cdr (assoc "center" op)) dd (ard:vdot nv c))
+        (setq sxx (+ sxx (- 1.0 (* (car nv) (car nv)))) sxy (- sxy (* (car nv) (cadr nv)))
+              syy (+ syy (- 1.0 (* (cadr nv) (cadr nv))))
+              bx (+ bx (- (car c) (* (car nv) dd))) by (+ by (- (cadr c) (* (cadr nv) dd)))))
+      (setq det (- (* sxx syy) (* sxy sxy)))
+      (if (< (abs det) 1.0e-9)
+        nil
+        (progn
+          (setq x (/ (- (* syy bx) (* sxy by)) det) y (/ (- (* sxx by) (* sxy bx)) det))
+          (setq rms 0.0 cnt 0)
+          (foreach op ops
+            (setq nv (cdr (assoc "normal" op)) c (cdr (assoc "center" op)))
+            (setq rms (+ rms (expt (ard:vdot (ard:vperp nv) (ard:vsub (list x y) c)) 2)) cnt (1+ cnt)))
+          (list (list x y) (sqrt (/ rms cnt))))))))
+
 (defun ard:bbox-of (pts / xs ys)
   (if pts
     (progn
@@ -701,7 +855,7 @@
   (list (list (cos a) (sin a)) (list (- (sin a)) (cos a))))
 ;;; pts: (x y [tag]).  pick 'MIN = nearest to J ahead along the arm, 'MAX = farthest.
 ;;; -> (best cmin cmax face-count handles) or nil
-(defun ard:face (pts jp u n halfw pick / rx ry ax cr best sel p fmn fmx hs cnt)
+(defun ard:face (pts jp u n halfw pick / rx ry ax cr best sel p fmn fmx hs cnt crs)
   (foreach p pts
     (setq rx (- (car p) (car jp)) ry (- (cadr p) (cadr jp)))
     (setq ax (+ (* rx (car u)) (* ry (cadr u))) cr (+ (* rx (car n)) (* ry (cadr n))))
@@ -716,10 +870,11 @@
         (if (<= (abs (- (car p) best)) ard:th-face)
           (progn
             (setq cnt (1+ (if cnt cnt 0)))
+            (setq crs (cons (cadr p) crs))
             (if (or (null fmn) (< (cadr p) fmn)) (setq fmn (cadr p)))
             (if (or (null fmx) (> (cadr p) fmx)) (setq fmx (cadr p)))
             (if (and (caddr p) (not (member (caddr p) hs))) (setq hs (cons (caddr p) hs))))))
-      (list best fmn fmx cnt (reverse hs)))
+      (list best fmn fmx cnt (reverse hs) crs))
     nil))
 (defun ard:world-pt (jp u n ax cr)
   (list (+ (car jp) (* (car u) ax) (* (car n) cr))
@@ -744,50 +899,130 @@
   (list (/ (+ (* (car v) (cos rot)) (* (cadr v) (sin rot))) (car sc))
         (/ (- (* (cadr v) (cos rot)) (* (car v) (sin rot))) (cadr sc))))
 (defun ard:pt2 (p) (if p (ard:arr (list (float (car p)) (float (cadr p)))) nil))
-;;; expected = centre of the nearest generated Straight end face on the arm (corridor-limited);
-;;; actual   = centre of the fitting geometry's farthest end face along the arm direction
-;;;            (NOT corridor-limited, so a displaced fitting is still measured).
-(defun ard:connection (fit jn arm spts / jp fr u n w halfw fpts sf ff status err ex ac reason d)
+;;; ---- opening (block -> WCS) and arm matching -------------------------------
+(defun ard:lin (m v)
+  (list (+ (* (nth 0 m) (car v)) (* (nth 2 m) (cadr v))) (+ (* (nth 1 m) (car v)) (* (nth 3 m) (cadr v)))))
+(defun ard:opening-wcs (op m / k)
+  (setq k (ard:vlen (ard:lin m (cdr (assoc "u" op)))))
+  (list (cons "id" (cdr (assoc "id" op)))
+        (cons "center" (ard:mat-apply m (cdr (assoc "center" op))))
+        (cons "normal" (ard:vunit (ard:lin m (cdr (assoc "normal" op)))))
+        (cons "rails" (mapcar '(lambda (r) (mapcar '(lambda (q) (ard:mat-apply m q)) r)) (cdr (assoc "rails" op))))
+        (cons "w_cc" (* k (cdr (assoc "width_center_to_center" op))))
+        (cons "w_out" (* k (cdr (assoc "width_outer" op))))
+        (cons "w_in" (* k (cdr (assoc "width_inner" op))))))
+(defun ard:match-opening (arm jp opws used / u best bd o d)
+  (setq u (list (cos (cadr arm)) (sin (cadr arm))))
+  (foreach o opws
+    (if (and (not (member (cdr (assoc "id" o)) used))
+             (> (ard:vdot (cdr (assoc "normal" o)) u) (cos (* ard:th-open-dir-deg (/ pi 180.0)))))
+      (progn
+        (setq d (ard:d2 (cdr (assoc "center" o)) jp))
+        (if (or (null bd) (< d bd)) (setq best o bd d)))))
+  best)
+(defun ard:drop (lst n) (while (and lst (> n 0)) (setq lst (cdr lst) n (1- n))) lst)
+(defun ard:rail-stat (l) (list (apply 'min l) (apply 'max l) (/ (+ (apply 'min l) (apply 'max l)) 2.0)))
+(defun ard:split-rails (crs / s gap i best g1)
+  ;; cluster the cross coordinates of a Straight end face into two rails at the largest gap
+  (setq s (vl-sort crs '<))
+  (if (< (length s) 2)
+    nil
+    (progn
+      (setq best -1.0 i 0 g1 0)
+      (while (< (1+ i) (length s))
+        (setq gap (- (nth (1+ i) s) (nth i s)))
+        (if (> gap best) (setq best gap g1 i))
+        (setq i (1+ i)))
+      (list (ard:rail-stat (ard:take s (1+ g1))) (ard:rail-stat (ard:drop s (1+ g1)))))))
+(defun ard:opening-json (opw jp u n / rails)
+  (ard:obj
+    (list (cons "id" (cdr (assoc "id" opw)))
+          (cons "center" (ard:pt3 (list (car (cdr (assoc "center" opw))) (cadr (cdr (assoc "center" opw))) (ard:z jp))))
+          (cons "outward_normal" (ard:pt2 (cdr (assoc "normal" opw))))
+          (cons "width_center_to_center_mm" (cdr (assoc "w_cc" opw)))
+          (cons "width_outer_mm" (cdr (assoc "w_out" opw)))
+          (cons "width_inner_mm" (cdr (assoc "w_in" opw)))
+          (cons "rails"
+            (ard:arr
+              (mapcar '(lambda (r)
+                (ard:obj (list (cons "outer_edge" (ard:pt2 (nth 0 r))) (cons "inner_edge" (ard:pt2 (nth 1 r)))
+                               (cons "rail_center" (ard:pt2 (nth 2 r)))
+                               (cons "outer_edge_lateral_mm" (ard:vdot (ard:vsub (nth 0 r) jp) n))
+                               (cons "inner_edge_lateral_mm" (ard:vdot (ard:vsub (nth 1 r) jp) n))
+                               (cons "center_lateral_mm" (ard:vdot (ard:vsub (nth 2 r) jp) n)))))
+                (vl-sort (cdr (assoc "rails" opw))
+                         '(lambda (a b) (< (ard:vdot (ard:vsub (nth 2 a) jp) n) (ard:vdot (ard:vsub (nth 2 b) jp) n))))))))))
+;;; opening = fitting side (derived from block geometry), Straight = the generated Straight end face
+;;; on the same arm.  expected = opening centre, actual = Straight connection point.
+(defun ard:connection (fit jn arm spts op derived / jp fr u n w halfw fpts sf ff status err ex ac reason d
+                                                    fax flat method rails srails k)
   (setq jp (ard:jget "pt" jn) fr (ard:arm-frame arm) u (car fr) n (cadr fr)
         w (nth 5 arm) halfw (+ (/ w 2.0) ard:th-corridor))
   (setq fpts (ard:get "_pts" fit))
   (setq sf (ard:face spts jp u n halfw 'MIN))
-  (setq ff (if fpts (ard:face fpts jp u n 1.0e12 'MAX) nil))
   (cond
     ((null sf)
      (setq status "NOT_COMPUTABLE"
            reason "no generated Straight vertex ahead of the junction on this arm (Straight missing, too short, or outside the corridor)"))
-    ((null ff)
-     (setq status "NOT_COMPUTABLE"
-           reason (if fpts "fitting has no geometry" "fitting block definition has no readable geometry"))))
-  (if (and sf ff)
+    (op
+     (setq method "derived_opening"
+           fax (ard:vdot (ard:vsub (cdr (assoc "center" op)) jp) u)
+           flat (ard:vdot (ard:vsub (cdr (assoc "center" op)) jp) n)))
+    (derived
+     (setq status "NO_OPENING"
+           reason "the fitting has no opening facing this arm direction (rotation / fitting type does not match the PATH junction)"))
+    (T
+     (setq ff (if fpts (ard:face fpts jp u n 1.0e12 'MAX) nil) method "extreme_face_fallback")
+     (if ff
+       (setq fax (car ff) flat (ard:mid ff))
+       (setq status "NOT_COMPUTABLE" reason "fitting block definition has no readable geometry"))))
+  (if (and sf (null status))
     (progn
-      (setq ex (ard:world-pt jp u n (car sf) (ard:mid sf))
-            ac (ard:world-pt jp u n (car ff) (ard:mid ff))
-            err (ard:d2 ex ac) d (list (- (car ac) (car ex)) (- (cadr ac) (cadr ex)))
-            status (cond ((<= err ard:th-exact) "EXACT") ((<= err ard:th-near) "NEAR") (T "MISMATCH")))))
+      (setq ex (ard:world-pt jp u n fax flat)
+            ac (ard:world-pt jp u n (car sf) (ard:mid sf))
+            err (ard:d2 ex ac) d (list (- (car ex) (car ac)) (- (cadr ex) (cadr ac)))
+            status (cond ((<= err ard:th-exact) "EXACT") ((<= err ard:th-near) "NEAR") (T "MISMATCH")))
+      (if op
+        (progn
+          (setq rails (cdr (ard:get "rails" (ard:opening-json op jp u n))))
+          (setq srails (ard:split-rails (nth 5 sf)))))))
   (ard:obj
     (list (cons "direction" (car arm)) (cons "angle_deg" (* (cadr arm) (/ 180.0 pi)))
           (cons "path_handle" (nth 3 arm)) (cons "arm_profile" (nth 4 arm)) (cons "arm_width" w)
-          (cons "status" status) (cons "reason" reason)
-          (cons "expected_source" "centre of nearest generated Straight end face on this arm")
-          (cons "actual_source" "centre of farthest end face of fitting block-definition geometry along this arm")
+          (cons "status" status) (cons "reason" reason) (cons "method" method)
+          (cons "opening_id" (if op (cdr (assoc "id" op)) nil))
+          (cons "expected_source" (if op "centre of the fitting opening derived from block geometry (rail centres midpoint), transformed to WCS"
+                                      "centre of farthest end face of fitting geometry (fallback, weak evidence)"))
+          (cons "actual_source" "centre of the nearest generated Straight end face on this arm")
           (cons "expected" (if ex (ard:pt3 ex) nil))
           (cons "actual" (if ac (ard:pt3 ac) nil))
-          (cons "delta_x" (if d (car d) nil))
-          (cons "delta_y" (if d (cadr d) nil))
+          (cons "delta_x" (if d (- (car d)) nil))
+          (cons "delta_y" (if d (- (cadr d)) nil))
+          (cons "delta_convention" "delta = actual (Straight) - expected (opening); axial/lateral errors are fitting minus Straight")
           (cons "error_mm" err)
-          (cons "axial_error_mm" (if (and sf ff) (- (car ff) (car sf)) nil))
-          (cons "lateral_error_mm" (if (and sf ff) (- (ard:mid ff) (ard:mid sf)) nil))
+          (cons "axial_error_mm" (if (and ex sf) (- fax (car sf)) nil))
+          (cons "lateral_error_mm" (if (and ex sf) (- flat (ard:mid sf)) nil))
+          (cons "opening_distance_from_junction_mm" (if ex fax nil))
+          (cons "straight_start_distance_from_junction_mm" (if sf (car sf) nil))
           (cons "straight_end_width_mm" (if sf (- (caddr sf) (cadr sf)) nil))
-          (cons "fitting_opening_width_mm" (if ff (- (caddr ff) (cadr ff)) nil))
+          (cons "fitting_opening_width_mm" (if op (cdr (assoc "w_out" op)) nil))
+          (cons "opening" (if op (ard:opening-json op jp u n) nil))
+          (cons "straight_rails"
+            (if srails
+              (ard:arr (mapcar '(lambda (r) (ard:obj (list (cons "min_lateral_mm" (nth 0 r)) (cons "max_lateral_mm" (nth 1 r))
+                                                           (cons "center_lateral_mm" (nth 2 r))))) srails))
+              nil))
+          (cons "rail_center_differences_mm"
+            (if (and rails srails (= (length rails) (length srails)))
+              (ard:arr (mapcar '(lambda (fr sr) (- (ard:get "center_lateral_mm" fr) (nth 2 sr))) rails srails))
+              nil))
           (cons "expected_in_block_coords" (if ex (ard:pt2 (ard:w2b fit ex)) nil))
           (cons "actual_in_block_coords" (if ac (ard:pt2 (ard:w2b fit ac)) nil))
-          (cons "delta_in_block_coords" (if d (ard:pt2 (ard:wvec2b fit d)) nil))
+          (cons "delta_in_block_coords" (if d (ard:pt2 (ard:wvec2b fit (list (- (car d)) (- (cadr d))))) nil))
           (cons "straight_handles" (if sf (ard:arr (nth 4 sf)) nil))
           (cons "_err" err) (cons "_status" status) (cons "_d" d) (cons "_u" u) (cons "_n" n)
-          (cons "_wratio" (if (and sf ff (> (- (caddr sf) (cadr sf)) 1.0e-9))
-                            (/ (- (caddr ff) (cadr ff)) (- (caddr sf) (cadr sf))) nil)))))
+          (cons "_wratio" (if (and op sf (> (- (caddr sf) (cadr sf)) 1.0e-9))
+                            (/ (cdr (assoc "w_out" op)) (- (caddr sf) (cadr sf))) nil)))))
 ;;; raw evidence: how far the fitting geometry extends from the junction along E,W,N,S
 (defun ard:geometry-extents (fit jn / jp fpts out lab u n ext)
   (setq jp (ard:jget "pt" jn) fpts (ard:get "_pts" fit))
@@ -802,7 +1037,7 @@
 ;;; whole fitting (solved from the LATERAL components, least squares over arms) plus a per-arm axial
 ;;; residual.  T != 0 with small residuals -> placement offset (origin / BASE_OFFSET);
 ;;; T ~ 0 with equal axial residuals -> arm length / TAKEOFF; large lateral residual -> rotation / wrong type.
-(defun ard:translation-fit (fit conns / cs c sxx sxy syy bx by det tx ty n u l a per rms cnt hints tb ax-res mag ac)
+(defun ard:translation-fit (fit conns jdelta / cs c sxx sxy syy bx by det tx ty n u l a per rms cnt hints tb ax-res mag ac)
   (foreach c conns (if (ard:get "_d" c) (setq cs (cons c cs))))
   (setq cs (reverse cs))
   (if (< (length cs) 2)
@@ -833,6 +1068,10 @@
             (setq hints (cons (strcat "PLACEMENT_OFFSET: fitting is rigidly displaced by " (rtos mag 2 4)
                                       " mm (block-space vector " (rtos (car tb) 2 4) ", " (rtos (cadr tb) 2 4)
                                       "): block origin / BASE_OFFSET / insertion point") hints)))
+          (if (and jdelta (< (ard:d2 (list (- (car jdelta)) (- (cadr jdelta))) tb) 0.01))
+            (setq hints (cons (strcat "TRANSLATION_EQUALS_JOINT_DELTA: the shift equals (derived block joint - junction position in block coords) = ("
+                                      (rtos (- (car jdelta)) 2 4) ", " (rtos (- (cadr jdelta)) 2 4)
+                                      "); derived from block geometry alone, independent of the Straights") hints)))
           (foreach ac (cdr (ard:get "block_arc_centres" fit))
             (if (and (< (abs (- (car tb) (ard:get "x" ac))) 0.01) (< (abs (- (cadr tb) (ard:get "y" ac))) 0.01))
               (setq hints (cons (strcat "TRANSLATION_EQUALS_BLOCK_ARC_CENTRE: block-space shift equals the arc centre ("
@@ -937,6 +1176,9 @@
       ((= (ard:get "_status" c) "NEAR")
        (setq issues (cons (ard:issue "WARN" "CONNECTION_NEAR"
          (strcat "arm " (ard:get "direction" c) ": error " (rtos e 2 4) " mm")) issues)))
+      ((= (ard:get "_status" c) "NO_OPENING")
+       (setq issues (cons (ard:issue "FAIL" "ARM_WITHOUT_OPENING"
+         (strcat "arm " (ard:get "direction" c) ": " (ard:get "reason" c))) issues)))
       ((= (ard:get "_status" c) "NOT_COMPUTABLE")
        (setq issues (cons (ard:issue "WARN" "CONNECTION_NOT_COMPUTABLE"
          (strcat "arm " (ard:get "direction" c) ": " (ard:get "reason" c))) issues))))
@@ -969,7 +1211,7 @@
 (defun ard:z-normal-p (e)
   (and e (< (abs (car e)) 1.0e-9) (< (abs (cadr e)) 1.0e-9) (> (caddr e) 0.0)))
 (defun ard:analyze-fitting (fit / ip bb ref refsrc rank best second jn cand spts conns issues
-                                 status maxerr c e ang k g blk rel local)
+                                 status maxerr c e ang k g blk rel local ops opws op used unp jb m)
   (setq ip (ard:get "_ip" fit))
   (setq bb (ard:bbox-of (ard:get "_pts" fit)))
   (setq ref (if bb
@@ -992,8 +1234,20 @@
     (setq issues (cons (ard:issue "WARN" "NO_JUNCTION" "no PATH junction (degree >= 2) found in this layout") issues))
     (progn
       (setq spts (ard:straight-pts (ard:get "layout" fit)))
-      (foreach g (ard:jget "arms" jn) (setq conns (cons (ard:connection fit jn g spts) conns)))
+      (setq ops (nth 6 blk) m (ard:get "_matrix" fit))
+      (setq opws (mapcar '(lambda (o) (ard:opening-wcs o m)) ops))
+      (foreach g (ard:jget "arms" jn)
+        (setq op (ard:match-opening g (ard:jget "pt" jn) opws used))
+        (if op (setq used (cons (cdr (assoc "id" op)) used)))
+        (setq conns (cons (ard:connection fit jn g spts op (if ops T nil)) conns)))
       (setq conns (reverse conns))
+      (foreach o opws
+        (if (not (member (cdr (assoc "id" o)) used))
+          (setq issues (cons (ard:issue "FAIL" "OPENING_WITHOUT_ARM"
+            (strcat "fitting opening " (cdr (assoc "id" o)) " at (" (rtos (car (cdr (assoc "center" o))) 2 3) ", "
+                    (rtos (cadr (cdr (assoc "center" o))) 2 3) ") faces "
+                    (ard:dir-label (car (cdr (assoc "normal" o))) (cadr (cdr (assoc "normal" o))))
+                    " but the PATH junction has no arm in that direction")) issues))))
       (setq issues (append (reverse (ard:conn-issues conns)) issues))
       (if (/= (ard:get "fitting_type" fit) (ard:jget "class" jn))
         (setq issues (cons (ard:issue "FAIL" "FITTING_TOPOLOGY_MISMATCH"
@@ -1030,8 +1284,23 @@
         (ard:bool (< (abs (- (abs (car (ard:get "_scale" fit))) (abs (cadr (ard:get "_scale" fit))))) 1.0e-9)))
       (cons "fitting_geometry_extent_from_junction_mm"
         (if jn (ard:obj (mapcar '(lambda (g) (cons (car g) (cdr g))) (ard:geometry-extents fit jn))) nil))
+      (cons "opening_method" (if (nth 6 blk) "derived_opening" "extreme_face_fallback"))
+      (cons "openings"
+        (ard:arr (mapcar '(lambda (o)
+                   (ard:obj (list (cons "id" (cdr (assoc "id" o)))
+                                  (cons "center" (ard:pt2 (cdr (assoc "center" o))))
+                                  (cons "outward_normal" (ard:pt2 (cdr (assoc "normal" o))))
+                                  (cons "facing" (ard:dir-label (car (cdr (assoc "normal" o))) (cadr (cdr (assoc "normal" o)))))
+                                  (cons "width_center_to_center_mm" (cdr (assoc "w_cc" o)))
+                                  (cons "width_outer_mm" (cdr (assoc "w_out" o))))))
+                 opws)))
+      (cons "derived_joint_block" (if (nth 7 blk) (ard:pt2 (car (nth 7 blk))) nil))
+      (cons "derived_joint_rms" (if (nth 7 blk) (cadr (nth 7 blk)) nil))
+      (cons "derived_joint_wcs" (if (nth 7 blk) (ard:pt2 (ard:mat-apply (ard:get "_matrix" fit) (car (nth 7 blk)))) nil))
+      (cons "junction_minus_derived_joint_block"
+        (if (and jn (nth 7 blk)) (ard:pt2 (ard:vsub local (car (nth 7 blk)))) nil))
       (cons "connections" (ard:arr conns))
-      (cons "translation_fit" (if jn (ard:translation-fit fit conns) nil))
+      (cons "translation_fit" (if jn (ard:translation-fit fit conns (if (nth 7 blk) (ard:vsub local (car (nth 7 blk))) nil)) nil))
       (cons "max_connection_error_mm" maxerr)
       (cons "connected_path_candidates" (ard:arr (ard:take cand ard:th-cand-max)))
       (cons "issues" (ard:arr issues))
@@ -1108,11 +1377,65 @@
           (cons "end_face_band_mm" ard:th-face)
           (cons "arc_sampling_step_deg" ard:th-arc-deg)
           (cons "path_candidates_listed" ard:th-cand-max)
+          (cons "opening_geometry_tolerance_relative_to_block_diagonal" ard:th-geom-rel)
+          (cons "opening_direction_tolerance_deg" ard:th-open-dir-deg)
           (cons "connection_status_rule" "error <= exact_mm -> EXACT; <= near_mm -> NEAR; else MISMATCH; expected or actual missing -> NOT_COMPUTABLE")
           (cons "relation_rule" "path relation from distance to the selected junction (else to the insertion point): <= exact_mm exact; <= near_mm near; else unrelated")
-          (cons "expected_point_definition" "centre of the nearest generated Straight end face along the arm (Straight vertices in the arm corridor)")
-          (cons "actual_point_definition" "centre of the farthest end face of the fitting block-definition geometry along the arm (arcs sampled); not corridor-limited")
+          (cons "expected_point_definition" "centre of the fitting OPENING derived from block geometry (cap pair + rail edges), transformed by scale/rotation/insertion to WCS")
+          (cons "actual_point_definition" "centre of the nearest generated Straight end face along the arm (Straight vertices in the arm corridor)")
           (cons "units_note" "all *_mm values are drawing units; the Router assumes millimetres (see insunits)"))))
+(defun ard:dedupe-arcs (recs / out r hit o)
+  (foreach r recs
+    (setq hit nil)
+    (foreach o out
+      (if (and (< (ard:d2 (car r) (car o)) 0.001) (< (abs (- (cadr r) (cadr o))) 0.001)
+               (< (abs (- (caddr r) (caddr o))) 1.0e-6) (< (abs (- (cadddr r) (cadddr o))) 1.0e-6))
+        (setq hit T)))
+    (if (not hit) (setq out (cons r out))))
+  (reverse out))
+(defun ard:opening-local-json (o)
+  (ard:obj
+    (list (cons "id" (cdr (assoc "id" o)))
+          (cons "opening_center" (ard:pt2 (cdr (assoc "center" o))))
+          (cons "outward_normal" (ard:pt2 (cdr (assoc "normal" o))))
+          (cons "width_rail_center_to_rail_center" (cdr (assoc "width_center_to_center" o)))
+          (cons "width_outer_edge_to_outer_edge" (cdr (assoc "width_outer" o)))
+          (cons "width_inner_edge_to_inner_edge" (cdr (assoc "width_inner" o)))
+          (cons "rail_end_cap_length" (cdr (assoc "cap_length" o)))
+          (cons "rails"
+            (ard:arr (mapcar '(lambda (r)
+              (ard:obj (list (cons "outer_edge_point" (ard:pt2 (nth 0 r)))
+                             (cons "inner_edge_point" (ard:pt2 (nth 1 r)))
+                             (cons "rail_center_point" (ard:pt2 (nth 2 r))))))
+              (cdr (assoc "rails" o))))))))
+(defun ard:block-report (name / bl base pts)
+  (setq bl (ard:block-local name) pts (cadr bl) base (ard:block-base name))
+  (ard:obj
+    (list (cons "name" name) (cons "found" (ard:bool (car bl)))
+          (cons "block_origin" (ard:pt2 base))
+          (cons "bbox_local" (ard:bb-json (ard:bbox-of pts)))
+          (cons "entity_tally" (ard:obj (mapcar '(lambda (c) (cons (car c) (cdr c))) (reverse (caddr bl)))))
+          (cons "geometry_tolerance_block_units" (ard:geom-tol pts))
+          (cons "segments"
+            (ard:arr (mapcar '(lambda (sg)
+              (ard:obj (list (cons "p" (ard:pt2 (car sg))) (cons "q" (ard:pt2 (cadr sg)))
+                             (cons "length" (ard:d2 (car sg) (cadr sg))))))
+              (nth 4 bl))))
+          (cons "arcs"
+            (ard:arr (mapcar '(lambda (a)
+              (ard:obj (list (cons "center" (ard:pt2 (car a))) (cons "radius" (cadr a))
+                             (cons "start_angle_deg" (* (caddr a) (/ 180.0 pi)))
+                             (cons "end_angle_deg" (* (cadddr a) (/ 180.0 pi))))))
+              (ard:dedupe-arcs (nth 5 bl)))))
+          (cons "openings" (ard:arr (mapcar 'ard:opening-local-json (nth 6 bl))))
+          (cons "derived_joint" (if (nth 7 bl) (ard:pt2 (car (nth 7 bl))) nil))
+          (cons "derived_joint_axis_rms" (if (nth 7 bl) (cadr (nth 7 bl)) nil))
+          (cons "definitions"
+            (ard:obj (list (cons "outer_edge" "extreme end point of a rail end cap (outside of the rail)")
+                           (cons "inner_edge" "other end point of the cap (rail side facing the tray interior)")
+                           (cons "rail_center" "midpoint of the cap = centre line of that rail")
+                           (cons "opening_center" "midpoint of the two rail centres")
+                           (cons "block_origin" "block base point (INSERT block-space origin)")))))))
 (defun ard:build-report (mode fits sel-paths sel-straights / dwg)
   (setq dwg (ard:sysvar "DWGNAME"))
   (ard:obj
@@ -1137,6 +1460,8 @@
                            (cons "straights_in_report" (length sel-straights))
                            (cons "junctions_analyzed" (length ard:*junctions*)))))
           (cons "fittings" (ard:arr fits))
+          (cons "blocks" (ard:arr (mapcar 'ard:block-report
+                                          (ard:unique-strs (mapcar '(lambda (f) (ard:get "raw_block_name" f)) fits)))))
           (cons "junctions"
             (ard:arr
               (if (= mode "export") nil
@@ -1282,24 +1607,27 @@
                     "  classification " (ard:get "classification" j))
             (strcat "  junction offset from insert " (ard:ps (ard:arr-pt (ard:get "junction_offset_from_insert" f)))
                     "  junction in block coords " (ard:ps (ard:arr-pt (ard:get "junction_in_block_coords" f))))
+            (strcat "  derived block joint (from opening axes) " (ard:ps (ard:arr-pt (ard:get "derived_joint_block" f)))
+                    "  junction minus derived joint (block coords) " (ard:ps (ard:arr-pt (ard:get "junction_minus_derived_joint_block" f)))
+                    "  opening method " (ard:get "opening_method" f))
             (strcat "  rotation nearest quarter turn " (ard:t (ard:get "rotation_nearest_quarter_turn_deg" f) 1)
                     " deg, residual " (ard:t (ard:get "rotation_residual_deg" f) 6)))))
       (foreach c (cdr (ard:get "connections" f))
         (setq lines
           (append lines
             (list
-              (strcat "  arm " (ard:get "direction" c) " path " (ard:get "path_handle" c)
+              (strcat "  arm " (ard:get "direction" c) " opening " (if (ard:get "opening_id" c) (ard:get "opening_id" c) "-") " path " (ard:get "path_handle" c)
                       " (" (ard:get "arm_profile" c) " / " (ard:t (ard:get "arm_width" c) 1) ") [" (ard:get "status" c) "]"
                       (if (ard:get "expected" c)
-                        (strcat "  expected " (ard:ps (ard:arr-pt (ard:get "expected" c)))
-                                " actual " (ard:ps (ard:arr-pt (ard:get "actual" c)))
+                        (strcat "  opening " (ard:ps (ard:arr-pt (ard:get "expected" c)))
+                                " Straight " (ard:ps (ard:arr-pt (ard:get "actual" c)))
                                 " delta (" (ard:t (ard:get "delta_x" c) 5) ", " (ard:t (ard:get "delta_y" c) 5) ")"
                                 " error " (ard:t (ard:get "error_mm" c) 5) " mm"
                                 " (axial " (ard:t (ard:get "axial_error_mm" c) 5) ", lateral " (ard:t (ard:get "lateral_error_mm" c) 5) ")")
                         (strcat "  " (if (ard:get "reason" c) (ard:get "reason" c) "")))))
             (if (ard:get "expected" c)
-              (list (strcat "      in block coords: expected " (ard:ps (ard:arr-pt (ard:get "expected_in_block_coords" c)))
-                            " actual " (ard:ps (ard:arr-pt (ard:get "actual_in_block_coords" c)))
+              (list (strcat "      in block coords: opening " (ard:ps (ard:arr-pt (ard:get "expected_in_block_coords" c)))
+                            " Straight " (ard:ps (ard:arr-pt (ard:get "actual_in_block_coords" c)))
                             " delta " (ard:ps (ard:arr-pt (ard:get "delta_in_block_coords" c)))
                             "  opening width " (ard:t (ard:get "fitting_opening_width_mm" c) 3)
                             " vs Straight end " (ard:t (ard:get "straight_end_width_mm" c) 3)))

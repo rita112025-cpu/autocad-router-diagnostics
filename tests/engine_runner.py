@@ -23,7 +23,8 @@ SCENES = [
     "tee-r0", "tee-r3", "cross", "mixed-paths", "profile-mismatch", "no-xdata", "no-path",
     "multi-candidates", "escape", "rot-error", "takeoff-error", "offset-error", "no-fitting",
     "topology-mismatch", "readonly", "unsupported-path-entity", "extrusion-insert", "xdata-tag-fitting",
-    "future-profile", "not-a-fitting",
+    "future-profile", "not-a-fitting", "curved-r1", "curved-r3-shifted-pivot",
+    "curved-router-assumption", "curved-takeoff-at-tangent", "curved-decoy", "curved-rot-error",
 ]
 _cache: dict = {}
 

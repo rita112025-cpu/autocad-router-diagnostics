@@ -62,10 +62,17 @@ otherwise the `CTR_GEN` XDATA tag `ELBOW|TEE|CROSS`. The profile is the text bef
   segment directions. `E/W/N/S` come from the actual vector angle (tolerance 1e-4 rad, as the Router); other angles are `OTHER`.
   `classification` = `STRAIGHT | ELBOW | TEE | CROSS | UNKNOWN`, plus `END` (degree 1). `directions` are always ordered `E,W,N,S`.
   The junction chosen for a fitting is the degree>=2 node nearest to the centre of the fitting's block-definition geometry (same layout).
-* **expected** (per arm) = centre of the nearest generated Straight end face on that arm.
-  **actual** = centre of the farthest end face of the fitting's block-definition geometry along that arm (arcs sampled, nested blocks followed).
-  `delta = actual - expected`; `axial_error_mm` > 0 means the fitting extends **past** the Straight start (overlap), < 0 a gap.
-  If either side cannot be found: `"status":"NOT_COMPUTABLE"` with a `reason` - nothing is invented.
+* **Openings** are derived from the block geometry, never from the farthest point: two collinear equal rail-end **caps** separated by a gap wider than
+  the cap, each cap end attached to a perpendicular **rail edge** on the same side, nothing of the block beyond the cap line inside the caps' strip.
+  Per opening: **outer edge** (extreme cap end), **inner edge** (other cap end), **rail centre** (cap midpoint), **opening centre** (midpoint of the two rail
+  centres), outward normal. The opening axes also give a **derived block joint** (least-squares crossing), independent of any Straight. Block geometry
+  (LINE endpoints, ARC centre/radius/angles, origin, bbox, openings) is written to `blocks[]`.
+* **expected** (per arm) = the fitting opening centre (block opening transformed by scale, rotation, insertion, block base point to WCS), paired with the arm it faces
+  (outward normal within 0.5 deg). **actual** = centre of the nearest generated Straight end face on that arm. `delta = actual - expected`;
+  `axial_error_mm` / `lateral_error_mm` are fitting minus Straight (`axial > 0`: the fitting extends past the Straight start). An arm with no opening facing it is
+  `NO_OPENING` (`ARM_WITHOUT_OPENING`, FAIL); an opening facing a direction with no arm is `OPENING_WITHOUT_ARM` (FAIL) - the signature of a wrong rotation.
+  Rail-level evidence: `rail_center_differences_mm`. If a block yields no openings the tool falls back to `extreme_face_fallback` (weak evidence, stated in
+  `method`). If either side cannot be found: `"status":"NOT_COMPUTABLE"` with a `reason` - nothing is invented.
 * **`translation_fit`**: solves one rigid world translation `T` from the *lateral* components of the per-arm deltas (least squares) and
   leaves a per-arm `axial_residual`. `in_block_coords` is `T` un-rotated and un-scaled. Rules of thumb:
   `T != 0`, small residuals -> placement (block origin / BASE_OFFSET); `T ~ 0`, equal axial residuals -> arm length / TAKEOFF;

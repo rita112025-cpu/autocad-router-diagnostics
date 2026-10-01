@@ -200,7 +200,7 @@ class FittingRecords(unittest.TestCase):
     def test_bounding_box_is_computed_from_block_definition(self):
         f = fit("elbow-r0")                       # s=1, rot 0, joint (100,-50) at (1000,2000): ip=(900,2050)
         self.assertEqual(f["bounding_box_source"], "computed_from_block_definition")
-        self.assertEqual(f["bounding_box_min"][:2], [850.0, 1850.0])
+        self.assertEqual(f["bounding_box_min"][:2], [840.0, 1840.0])
         self.assertEqual(f["bounding_box_max"][:2], [1300.0, 2300.0])
 
     def test_basic_and_v2_blocks(self):
@@ -239,7 +239,7 @@ class FittingRecords(unittest.TestCase):
         # E arm of an unrotated elbow with joint (1000,2000) and takeoff 300: Straight starts at x=1300
         self.assertEqual(c["expected"], [1300.0, 2000.0, 0.0])
         self.assertEqual(c["actual"], [1300.0, 2000.0, 0.0])
-        self.assertEqual((c["straight_end_width_mm"], c["fitting_opening_width_mm"]), (300.0, 300.0))
+        self.assertEqual((c["straight_end_width_mm"], c["fitting_opening_width_mm"]), (320.0, 320.0))
         self.assertGreaterEqual(len(c["straight_handles"]), 2)
 
 
@@ -280,13 +280,12 @@ class Mismatch(unittest.TestCase):
         self.assertEqual(f["status"], "FAIL")
         self.assertEqual(f["junction"]["directions"], ["W", "S"])
         self.assertEqual(arm(f, "W")["status"], "EXACT")
-        s = arm(f, "S")
-        self.assertEqual(s["status"], "MISMATCH")
-        self.assertAlmostEqual(s["axial_error_mm"], -150.0, places=6)
-        self.assertAlmostEqual(s["lateral_error_mm"], -150.0, places=6)
-        self.assertAlmostEqual(s["error_mm"], math.hypot(150, 150), places=6)
-        self.assertAlmostEqual(f["max_connection_error_mm"], math.hypot(150, 150), places=6)
-        self.assertIn("CONNECTION_MISMATCH", codes(f))
+        s_arm = arm(f, "S")
+        self.assertEqual(s_arm["status"], "NO_OPENING")          # rotated fitting has no opening facing S
+        self.assertIsNone(s_arm["error_mm"])
+        self.assertIn("ARM_WITHOUT_OPENING", codes(f))
+        self.assertIn("OPENING_WITHOUT_ARM", codes(f))           # ... but one facing N where the PATH has no arm
+        self.assertEqual(sorted(o["facing"] for o in f["openings"]), ["N", "W"])
 
     def test_takeoff_error_is_axial_only(self):
         f = fit("takeoff-error")
@@ -306,8 +305,8 @@ class Mismatch(unittest.TestCase):
         f = fit("offset-error")
         self.assertEqual(f["status"], "FAIL")
         for c in f["connections"]:
-            self.assertAlmostEqual(c["delta_x"], 3.0, places=6)
-            self.assertAlmostEqual(c["delta_y"], 4.0, places=6)
+            self.assertAlmostEqual(c["delta_x"], -3.0, places=6)     # delta = Straight - opening
+            self.assertAlmostEqual(c["delta_y"], -4.0, places=6)
             self.assertAlmostEqual(c["error_mm"], 5.0, places=6)
         t = f["translation_fit"]
         self.assertAlmostEqual(t["dx"], 3.0, places=6)
@@ -491,3 +490,133 @@ class AnalyzerOnRealOutput(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def unit_close(a, b, tol=1e-6):
+    return all(abs(x - y) <= tol for x, y in zip(a, b))
+
+
+class CurvedElbowOpenings(unittest.TestCase):
+    """Regression: a curved ELBOW block (ARC + LINE, stubs, rungs) must be judged by its OPENINGS,
+    not by its farthest point.  All numbers below come from the harness constants, not from the tool."""
+
+    R, CC, CT, ST = 576.0, 622.9333333333, 17.0666666667, 68.2666666667
+    S = 0.48159249
+
+    def block(self, scene):
+        return rep(scene)["blocks"][0]
+
+    def test_block_local_geometry_listing(self):
+        b = self.block("curved-r1")
+        self.assertEqual(b["block_origin"], [0.0, 0.0])
+        self.assertEqual(len(b["segments"]), 16)                         # duplicates removed
+        self.assertEqual(len(b["arcs"]), 4)
+        self.assertEqual(sorted(round(a["radius"], 3) for a in b["arcs"]), [256.0, 273.067, 878.933, 896.0])
+        for a in b["arcs"]:
+            self.assertEqual(a["center"], [0.0, 0.0])
+            self.assertAlmostEqual(a["start_angle_deg"], 270.0, places=6)
+            self.assertAlmostEqual(a["end_angle_deg"] % 360.0, 0.0, places=6)
+        self.assertEqual(b["bbox_local"]["min"][:2], [-self.ST, -896.0])
+        self.assertAlmostEqual(b["bbox_local"]["max"][0], 896.0, places=4)
+        self.assertAlmostEqual(b["bbox_local"]["max"][1], self.ST, places=4)
+
+    def test_two_openings_from_rail_end_caps(self):
+        b = self.block("curved-r1")
+        self.assertEqual(len(b["openings"]), 2)
+        west = next(o for o in b["openings"] if o["outward_normal"] == [-1.0, 0.0])
+        north = next(o for o in b["openings"] if o["outward_normal"] == [0.0, 1.0])
+        self.assertTrue(unit_close(west["opening_center"], [-self.ST, -self.R], 1e-3))
+        self.assertTrue(unit_close(north["opening_center"], [self.R, self.ST], 1e-3))
+        for o in (west, north):
+            self.assertAlmostEqual(o["width_rail_center_to_rail_center"], self.CC, places=3)
+            self.assertAlmostEqual(o["width_outer_edge_to_outer_edge"], self.CC + self.CT, places=3)
+            self.assertAlmostEqual(o["width_inner_edge_to_inner_edge"], self.CC - self.CT, places=3)
+            self.assertAlmostEqual(o["rail_end_cap_length"], self.CT, places=3)
+            for rail in o["rails"]:
+                oe, ie, rc = rail["outer_edge_point"], rail["inner_edge_point"], rail["rail_center_point"]
+                self.assertTrue(unit_close(rc, [(oe[0] + ie[0]) / 2, (oe[1] + ie[1]) / 2], 1e-6))
+                self.assertAlmostEqual(math.dist(oe, ie), self.CT, places=3)
+        # west opening: rail centres at y = -576 +- cc/2, outer edges beyond them, inner edges toward the centre
+        ys = sorted(r["rail_center_point"][1] for r in west["rails"])
+        self.assertAlmostEqual(ys[0], -self.R - self.CC / 2, places=3)
+        self.assertAlmostEqual(ys[1], -self.R + self.CC / 2, places=3)
+        low = min(west["rails"], key=lambda r: r["rail_center_point"][1])
+        self.assertLess(low["outer_edge_point"][1], low["inner_edge_point"][1])
+        self.assertLess(low["outer_edge_point"][1], low["rail_center_point"][1])
+        # the two opening axes cross at the tangent-line corner (576,-576); pivot is the arc centre (0,0)
+        self.assertTrue(unit_close(b["derived_joint"], [self.R, -self.R], 1e-3))
+        self.assertLess(b["derived_joint_axis_rms"], 1e-3)
+
+    def test_correct_curved_elbow_has_zero_error(self):
+        f = fit("curved-r1")
+        self.assertEqual(f["opening_method"], "derived_opening")
+        self.assertEqual(f["status"], "OK", f["issues"])
+        self.assertEqual(f["junction"]["directions"], ["W", "S"])
+        for c in f["connections"]:
+            self.assertEqual(c["status"], "EXACT")
+            self.assertLess(c["error_mm"], 1e-5)
+            self.assertIsNotNone(c["opening_id"])
+            self.assertEqual(len(c["rail_center_differences_mm"]), 2)
+            self.assertTrue(all(abs(d) < 1e-5 for d in c["rail_center_differences_mm"]), c["rail_center_differences_mm"])
+            self.assertAlmostEqual(c["opening_distance_from_junction_mm"], (self.R + self.ST) * self.S, places=4)
+            self.assertAlmostEqual(c["straight_start_distance_from_junction_mm"], (self.R + self.ST) * self.S, places=4)
+        self.assertTrue(unit_close(f["junction_minus_derived_joint_block"], [0.0, 0.0], 1e-3))
+
+    def test_pivot_not_at_origin_is_still_exact_when_placed_from_the_joint(self):
+        f = fit("curved-r3-shifted-pivot")
+        self.assertEqual(f["status"], "OK", f["issues"])
+        self.assertLess(f["max_connection_error_mm"], 1e-5)
+        b = self.block("curved-r3-shifted-pivot")
+        self.assertTrue(unit_close(b["derived_joint"], [-686.7333333333 + self.R, 521.0 - self.R], 1e-3))
+
+    def test_farthest_point_decoy_is_not_an_opening(self):
+        f = fit("curved-decoy")
+        self.assertEqual(f["status"], "OK", f["issues"])
+        self.assertLess(f["max_connection_error_mm"], 1e-5)
+        b = self.block("curved-decoy")
+        self.assertLess(b["bbox_local"]["min"][0], -self.ST - 399.0)     # decoy sticks out 400 beyond the caps
+        self.assertEqual(len(b["openings"]), 2)
+        west = next(o for o in b["openings"] if o["outward_normal"] == [-1.0, 0.0])
+        self.assertTrue(unit_close(west["opening_center"], [-self.ST, -self.R], 1e-3))
+        # an extreme-point metric would have measured the decoy: it is much farther than the opening
+        ext = f["fitting_geometry_extent_from_junction_mm"]
+        open_dist = f["connections"][0]["opening_distance_from_junction_mm"]
+        self.assertGreater(max(v for v in ext.values() if v is not None), open_dist + 300.0 * self.S)
+
+    def test_router_style_origin_assumption_is_a_pure_translation(self):
+        """The situation seen in TEST.dwg: block pivot != origin but placement assumes joint (576,-576)."""
+        f = fit("curved-router-assumption")
+        self.assertEqual(f["status"], "FAIL")
+        t = f["translation_fit"]
+        self.assertTrue(unit_close(t["in_block_coords"], [-686.7333333333, 521.0], 1e-3), t["in_block_coords"])
+        self.assertAlmostEqual(t["magnitude_mm"], math.hypot(686.7333333333, 521.0) * self.S, places=3)
+        self.assertLess(t["rms_lateral_residual_mm"], 1e-4)
+        self.assertTrue(all(abs(p["axial_residual_mm"]) < 1e-4 for p in t["per_arm"]))
+        for c in f["connections"]:
+            self.assertEqual(c["status"], "MISMATCH")
+            self.assertAlmostEqual(c["error_mm"], t["magnitude_mm"], places=3)
+        self.assertTrue(unit_close(f["junction_in_block_coords"], [self.R, -self.R], 1e-3))
+        self.assertTrue(unit_close(f["derived_joint_block"], [-686.7333333333 + self.R, 521.0 - self.R], 1e-3))
+        self.assertTrue(unit_close(f["junction_minus_derived_joint_block"], [686.7333333333, -521.0], 1e-3))
+        self.assertTrue(any(h.startswith("TRANSLATION_EQUALS_JOINT_DELTA") for h in t["hints"]))
+        self.assertTrue(any(h.startswith("PLACEMENT_OFFSET") for h in t["hints"]))
+
+    def test_takeoff_at_arc_tangent_leaves_only_the_stub_as_axial_residual(self):
+        f = fit("curved-takeoff-at-tangent")
+        t = f["translation_fit"]
+        self.assertLess(t["magnitude_mm"], 1e-4)
+        for p in t["per_arm"]:
+            self.assertAlmostEqual(p["axial_residual_mm"], self.ST * self.S, places=3)
+            self.assertLess(abs(p["lateral_residual_mm"]), 1e-4)
+        for c in f["connections"]:
+            self.assertAlmostEqual(c["error_mm"], self.ST * self.S, places=3)
+            self.assertAlmostEqual(c["axial_error_mm"], self.ST * self.S, places=3)
+        self.assertTrue(any(h.startswith("ARM_LENGTH_OR_TAKEOFF") for h in t["hints"]))
+        self.assertFalse(any(h.startswith("PLACEMENT_OFFSET") for h in t["hints"]))
+
+    def test_wrong_rotation_is_reported_as_missing_opening_not_as_a_distance(self):
+        f = fit("curved-rot-error")
+        self.assertEqual(f["status"], "FAIL")
+        self.assertIn("ARM_WITHOUT_OPENING", codes(f))
+        self.assertIn("OPENING_WITHOUT_ARM", codes(f))
+        self.assertIn("NO_OPENING", [c["status"] for c in f["connections"]])
