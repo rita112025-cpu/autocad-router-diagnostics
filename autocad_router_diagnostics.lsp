@@ -612,7 +612,15 @@
       (list (list (apply 'min xs) (apply 'min ys)) (list (apply 'max xs) (apply 'max ys)))
       )
     nil))
-(defun ard:activex-bbox (en / ob mn mx r)
+(defun ard:sa->list (x / r)
+  ;; full AutoCAD hands back a safearray, other hosts a variant: accept both, never raise
+  (setq r (vl-catch-all-apply
+            '(lambda ()
+               (if (= (type x) 'VARIANT) (setq x (vlax-variant-value x)))
+               (vlax-safearray->list x))
+            nil))
+  (if (vl-catch-all-error-p r) nil r))
+(defun ard:activex-bbox (en / ob mn mx r a b)
   (setq ob (vl-catch-all-apply 'vlax-ename->vla-object (list en)))
   (if (vl-catch-all-error-p ob)
     nil
@@ -620,8 +628,9 @@
       (setq r (vl-catch-all-apply '(lambda () (vla-getboundingbox ob 'mn 'mx) T) nil))
       (if (or (vl-catch-all-error-p r) (null mn) (null mx))
         nil
-        (list (vlax-safearray->list (vlax-variant-value mn))
-              (vlax-safearray->list (vlax-variant-value mx)))))))
+        (progn
+          (setq a (ard:sa->list mn) b (ard:sa->list mx))
+          (if (and a b) (list a b) nil))))))
 (defun ard:effective-name (en / ob r)
   (setq ob (vl-catch-all-apply 'vlax-ename->vla-object (list en)))
   (if (vl-catch-all-error-p ob)

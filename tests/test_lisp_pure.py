@@ -112,6 +112,7 @@ CASES = [
     ("connection_arm_without_opening",
      '(progn (setq c (ard:connection (ard:obj (list (cons "_pts" (list (list 60.0 0.0))))) (list (cons "pt" (list 0.0 0.0 0.0))) (list "E" 0.0 (list 100.0 0.0) "H" "P" 300.0) (list (list 50.0 10.0 "S") (list 50.0 -10.0 "S")) nil T)) (ard:get "status" c))',
      "NO_OPENING"),
+    ("sa_to_list_never_raises", '(vl-prin1-to-string (list (ard:sa->list 5) (ard:sa->list nil) (ard:sa->list "x")))', "(nil nil nil)"),
     ("z_normal_yes", '(vl-prin1-to-string (ard:z-normal-p (list 0.0 0.0 1.0)))', "T"),
     ("z_normal_no", '(vl-prin1-to-string (ard:z-normal-p (list 0.0 0.0 -1.0)))', "nil"),
     ("block_missing", '(vl-prin1-to-string (car (ard:block-local "NO_SUCH_BLOCK_ANYWHERE")))', "nil"),
